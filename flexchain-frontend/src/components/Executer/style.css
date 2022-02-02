@@ -1,0 +1,21 @@
+.highlight_green:not(.djs-connection) .djs-visual > :nth-child(1) {
+    fill: limegreen !important; /* color elements as green */
+    stroke: limegreen;
+    opacity: 0.6;
+}
+
+.highlight .djs-visual > :nth-child(2) {
+    fill: limegreen !important; /* color elements as green */
+    stroke: limegreen;
+}
+
+.highlight_white .djs-visual > :nth-child(2) {
+    fill: white !important; /* color elements as green */
+    stroke: white;
+}
+
+.highlight-overlay {
+    background-color: green; /* color elements as green */
+    opacity: 0.4;
+    pointer-events: none; /* no pointer events, allows clicking through onto the element */
+}
