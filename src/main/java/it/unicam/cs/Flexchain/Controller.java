@@ -4,12 +4,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 @RestController
 public class Controller {
 
+    @GetMapping(value = "/web3j")
+    public String getProcess(){
+        BlockchainUtils utils = new BlockchainUtils();
+        try {
+           return utils.getProcess("diagram.bpmn");
+        }catch (Exception e){return e.getMessage();}
 
+    }
 
     @GetMapping(value = "/generate-rules")
     public String getRules(){
@@ -89,4 +97,6 @@ public class Controller {
         ids.add("Message_0lfr0fv");
         return ids;
     }
+
+
 }

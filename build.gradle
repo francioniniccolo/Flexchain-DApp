@@ -2,8 +2,14 @@ plugins {
 	id 'org.springframework.boot' version '2.6.3'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
-	id 'org.web3j' version '4.8.7'
-	id "com.github.node-gradle.node" version "2.2.3"
+	id "com.github.node-gradle.node" version "3.1.1"
+	//id 'org.web3j:core' version '4.8.7'
+}
+task "npm-install"( type:NpmTask ) {
+	group = 'node'
+	description = 'Runs npm install'
+	workingDir = file '...'
+	args = [ 'install' ]
 }
 
 group = 'it.unicam.cs'
@@ -12,11 +18,17 @@ sourceCompatibility = '11'
 
 repositories {
 	mavenCentral()
+	maven { url 'https://jitpack.io' }
 }
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation ('org.web3j:core:4.8.7')
+	implementation('com.squareup.okhttp3:okhttp:4.9.3')
+	implementation 'com.github.ipfs:java-ipfs-http-client:v1.3.3'
+	implementation 'org.json:json:20211205'
+
 }
 
 
