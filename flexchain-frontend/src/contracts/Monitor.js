@@ -1,4 +1,4 @@
-export const MONITOR_ADDRESS="0x0947A2A7Cb8117A066Ba259BFACF3e470eA2CB50";
+export const MONITOR_ADDRESS="0xC658CFAfFc27Ad661966F84EFeD0BF3076883b6e";
 export const ABI=[
     {
         "inputs": [],
@@ -64,4 +64,4 @@ export const ABI=[
         "stateMutability": "nonpayable",
         "type": "function"
     }
-]
+];

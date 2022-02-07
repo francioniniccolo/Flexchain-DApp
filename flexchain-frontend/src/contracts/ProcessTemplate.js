@@ -30,41 +30,21 @@ export const TEMPLATE_ABI=[
         "type": "event"
     },
     {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "string[]",
-                "name": "messageId",
-                "type": "string[]"
-            },
-            {
-                "indexed": false,
-                "internalType": "string[]",
-                "name": "rule",
-                "type": "string[]"
-            }
-        ],
-        "name": "newRule",
-        "type": "event"
-    },
-    {
         "inputs": [
             {
                 "internalType": "string",
-                "name": "variable",
+                "name": "messageToExecute",
                 "type": "string"
-            }
-        ],
-        "name": "getBool",
-        "outputs": [
+            },
             {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
+                "internalType": "string[]",
+                "name": "inputs",
+                "type": "string[]"
             }
         ],
-        "stateMutability": "view",
+        "name": "executeMessage",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     },
     {
@@ -75,25 +55,6 @@ export const TEMPLATE_ABI=[
                 "internalType": "string",
                 "name": "",
                 "type": "string"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "string",
-                "name": "variable",
-                "type": "string"
-            }
-        ],
-        "name": "getInt",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
             }
         ],
         "stateMutability": "view",
@@ -148,25 +109,6 @@ export const TEMPLATE_ABI=[
         "inputs": [
             {
                 "internalType": "string",
-                "name": "variable",
-                "type": "string"
-            }
-        ],
-        "name": "getString",
-        "outputs": [
-            {
-                "internalType": "string",
-                "name": "",
-                "type": "string"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "string",
                 "name": "rules_hash",
                 "type": "string"
             },
@@ -185,23 +127,13 @@ export const TEMPLATE_ABI=[
         "inputs": [
             {
                 "internalType": "string[]",
-                "name": "types",
+                "name": "names",
                 "type": "string[]"
             },
             {
-                "internalType": "string[]",
-                "name": "variables",
-                "type": "string[]"
-            },
-            {
-                "internalType": "string[]",
+                "internalType": "bytes32[]",
                 "name": "values",
-                "type": "string[]"
-            },
-            {
-                "internalType": "string",
-                "name": "messageID",
-                "type": "string"
+                "type": "bytes32[]"
             }
         ],
         "name": "setVariables",
