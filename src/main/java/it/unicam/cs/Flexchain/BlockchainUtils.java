@@ -16,7 +16,9 @@ import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.Contract;
 import org.web3j.tx.gas.DefaultGasProvider;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
@@ -103,11 +105,31 @@ public class BlockchainUtils {
         String result = new String(fileContents);
         JSONArray ja = new JSONArray(result);
         System.out.println(ja);
+        File myObj = new File("filename.drl");
        /* NamedStreamable.ByteArrayWrapper file = new NamedStreamable.ByteArrayWrapper("hello.txt", "G'day world! IPFS rocks!".getBytes());
         MerkleNode addResult = ipfs.add(file).get(0);
         System.out.println("hash:"+addResult.hash.toBase58());
         Multihash fp = Multihash.fromBase58( addResult.hash.toBase58());
         byte[] fc= ipfs.cat(fp);
         System.out.println(new String(fc));*/
+    }
+
+    public void insertRules(String rule) throws Exception {
+       /* FileWriter wChor = new FileWriter(getRulesFile());
+        BufferedWriter bChor = new BufferedWriter(wChor);
+
+
+
+        String data = " ";
+		*//* for (String rule: rules) {
+            data += rule;
+        }*//*
+        String initial = "import java.util.List\n" +
+                "import java.util.Arrays\n" +
+                "import org.example.BlockchainUtils\n\n";
+        bChor.write(initial + rule);
+        bChor.flush();
+        bChor.close();*/
+
     }
 }
