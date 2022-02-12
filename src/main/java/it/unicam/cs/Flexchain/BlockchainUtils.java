@@ -6,6 +6,7 @@ import io.ipfs.api.MerkleNode;
 import io.ipfs.api.NamedStreamable;
 import io.ipfs.multihash.Multihash;
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.web3j.abi.datatypes.Utf8String;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
@@ -24,7 +25,10 @@ import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
 public class BlockchainUtils {
@@ -32,14 +36,14 @@ public class BlockchainUtils {
       Monitor monitor;
       Web3j web3j;
      BigInteger lastEventBlockNumber = BigInteger.valueOf(0L);
-
+      Process contract;
     public BlockchainUtils(){
         web3j=getWeb3j();
         monitor=getMonitor();
-        try {
-            this.subToMessages("0xcbb8bc3658643ae7f3F20117c16CCBAA967d3603");
-        }catch (Exception e){System.out.println(e.getMessage());}
+    }
 
+    public void setContract(String address){
+         contract = Process.load(address,web3j, Credentials.create("286cc41c3a685e6983aa9155d15d94fb1e71bbc1849b614f215f38a363c05916"), new DefaultGasProvider());
     }
 
     public String getProcess(String processName) throws Exception {
@@ -71,9 +75,17 @@ public class BlockchainUtils {
                             System.out.println("valore in stringa: " + stringValue);
                         }
                         System.out.println(messageId);
-                        String hash = contract.getRulesIpfs().send();
-                        System.out.println(hash);
-                      getRulesFromIpfs(hash);
+                        String hash_rules = contract.getRulesIpfs().send();
+                        String hash_ids = contract.getIdsIpfs().send();
+                        System.out.println(hash_rules);
+                       //JSONObject rules = getRulesFromIpfs(hash_rules,hash_ids);
+                       HashMap rules = getRulesFromIpfs(hash_rules,hash_ids);
+                       String rule="Vuota";
+                      // System.out.println(rules.get(messageId));
+
+
+
+                       insertToDroolsFile( rules.get(messageId).toString());
                       /*  u.insertRules(blockchainUtil.getRule(messageId));
                         System.out.println(lastEventBlockNumber);
                         blockchainUtil.setMessageInputs(stringList);
@@ -83,6 +95,15 @@ public class BlockchainUtils {
                     }
                 });
     }
+
+    private void insertToDroolsFile(String rule) throws IOException {
+        FileWriter fw = new FileWriter("src/main/resources/rules.drl", true);
+        BufferedWriter bw = new BufferedWriter(fw);
+        bw.write(rule);
+        bw.newLine();
+        bw.close();
+    }
+
 
     private Monitor getMonitor() {
         Monitor monitor = Monitor.load("0xC658CFAfFc27Ad661966F84EFeD0BF3076883b6e", web3j, Credentials.create("286cc41c3a685e6983aa9155d15d94fb1e71bbc1849b614f215f38a363c05916"), new DefaultGasProvider());
@@ -97,21 +118,25 @@ public class BlockchainUtils {
         return web3j.ethGetBlockByNumber(DefaultBlockParameterName.LATEST, false).send().getBlock().getNumber();
     }
 
-    public void getRulesFromIpfs(String hash) throws IOException {
+    public HashMap getRulesFromIpfs(String hash_rules, String hash_ids) throws IOException {
         IPFS ipfs = new IPFS("/dnsaddr/ipfs.infura.io/tcp/5001/https");
-        //IPFS ipfs = new IPFS("https://ipfs.infura.io:5001/api/v0");
-        Multihash filePointer = Multihash.fromBase58(hash);
-        byte[] fileContents = ipfs.cat(filePointer);
-        String result = new String(fileContents);
-        JSONArray ja = new JSONArray(result);
-        System.out.println(ja);
-        File myObj = new File("filename.drl");
-       /* NamedStreamable.ByteArrayWrapper file = new NamedStreamable.ByteArrayWrapper("hello.txt", "G'day world! IPFS rocks!".getBytes());
-        MerkleNode addResult = ipfs.add(file).get(0);
-        System.out.println("hash:"+addResult.hash.toBase58());
-        Multihash fp = Multihash.fromBase58( addResult.hash.toBase58());
-        byte[] fc= ipfs.cat(fp);
-        System.out.println(new String(fc));*/
+        Multihash filePointerToRules = Multihash.fromBase58(hash_rules);
+        Multihash filePointerToIds = Multihash.fromBase58(hash_ids);
+        byte[] fileContentsRules = ipfs.cat(filePointerToRules);
+        byte[] fileContentsIds = ipfs.cat(filePointerToIds);
+        String resultRules = new String(fileContentsRules);
+        String resultIds = new String(fileContentsIds);
+         JSONArray jaRules = new JSONArray(resultRules);
+         JSONArray jaIds = new JSONArray(resultIds);
+         System.out.println(jaRules.getString(0));
+         JSONObject jo = new JSONObject();
+        HashMap map = new HashMap();
+         for (int i=0;i<jaRules.length();i++){
+             map.put(jaIds.get(i).toString(),jaRules.getString(i));
+             //jo.append(jaIds.get(i).toString(),jaRules.getString(i));
+         }
+         return map;
+
     }
 
     public void insertRules(String rule) throws Exception {
@@ -131,5 +156,21 @@ public class BlockchainUtils {
         bChor.flush();
         bChor.close();*/
 
+    }
+
+    public BigInteger getState(String variable) throws Exception {
+       // BigInteger state = contract.getMessage(variable).send();
+       // return state;
+        BigInteger state = new BigInteger("0");
+        return state;
+    }
+    public void setVarialesToContract(List<String> types, List<String> variables, List<String> values, String messageId) throws Exception {
+        //contract.setVariables(stringVar, stringVal, uintVar, uintVal, boolVar, boolVal).send();
+       // contract.setVariables(types, variables, values, messageId).send();
+        System.out.println("Variables:"+types+variables+values+messageId);
+    }
+    public String getSingleInput(int index) {
+       // return messageInputs.get(index);
+        return "capricciosa";
     }
 }

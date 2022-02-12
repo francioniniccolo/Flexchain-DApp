@@ -1,53 +1,89 @@
 package it.unicam.cs.Flexchain;
 
+import org.kie.api.KieServices;
+import org.kie.api.builder.KieBuilder;
+import org.kie.api.builder.KieFileSystem;
+import org.kie.api.builder.KieRepository;
+import org.kie.api.builder.Message;
+import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieSession;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 @RestController
 public class Controller {
 
+    BlockchainUtils utils = new BlockchainUtils();
+
     @GetMapping(value = "/web3j")
     public String getProcess(){
-        BlockchainUtils utils = new BlockchainUtils();
         try {
+            utils.subToMessages("0x560ffc9a3a582be203a33883a5551730ff719ded");
            return utils.getProcess("diagram.bpmn");
         }catch (Exception e){return e.getMessage();}
 
     }
 
+    @GetMapping(value = "/fire")
+    public void fireRules(){
+        KieServices ks = KieServices.Factory.get();
+       KieRepository kr = ks.getRepository();
+        KieFileSystem kfs = ks.newKieFileSystem();
+        try {
+            kfs.write("src/main/resources/r1.drl", new String(Files.readAllBytes(Paths.get("src/main/resources/rules.drl"))));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        // Add KieFileSystem to KieBuilder
+        KieBuilder kb = ks.newKieBuilder(kfs);
+        kb.buildAll();
+        if (kb.getResults().hasMessages(Message.Level.ERROR)) {
+            throw new RuntimeException("Build Errors:\n" + kb.getResults().toString());
+        }
+        KieContainer kc = ks.newKieContainer(kr.getDefaultReleaseId());
+        KieSession kSession = kc.newKieSession();
+        kSession.insert(utils);
+        kSession.fireAllRules();
+        kSession.dispose();
+        System.out.println("Rules executed");
+    }
+
     @GetMapping(value = "/generate-rules")
     public String getRules(){
         String rules =
-        "rule 'Message_1pam53q'\n" +
+        "rule \"Message_1pam53q\"\n" +
                 "when\n" +
-                "   b : utils.BlockchainUtils(b.getState('Message_1pam53q')==0)\n" +
+                "   b : BlockchainUtils(b.getState(\"Message_1pam53q\")==0)\n" +
                 "then\n" +
-                "    List<String> types = Arrays.asList(new String[]{'string'});\n" +
-                "    List<String> variables = Arrays.asList(new String[]{'receipt_id'});\n" +
+                "    List<String> types = Arrays.asList(new String[]{\"string\"});\n" +
+                "    List<String> variables = Arrays.asList(new String[]{\"receipt_id\"});\n" +
                 "   List<String> values = Arrays.asList(new String[]{b.getSingleInput(0)});\n" +
-                "b.setVarialesToContract(types, variables, values, 'Message_1pam53q');\n" +
+                "b.setVarialesToContract(types, variables, values, \"Message_1pam53q\");\n" +
                 " end"+"$"+
-               "rule 'Message_1mi4idx'\n" +
+               "rule \"Message_1mi4idx\"\n" +
                 "when\n" +
-                "   b : utils.BlockchainUtils(b.getState('Message_1mi4idx')==0, b.getState('Message_1pam53q')==2)\n" +
+                "   b : BlockchainUtils(b.getState(\"Message_1mi4idx\")==0, b.getState(\"Message_1pam53q\")==2)\n" +
                 "then\n" +
-                "    List<String> types = Arrays.asList(new String[]{'string','string'});\n" +
-                "    List<String> variables = Arrays.asList(new String[]{'date','ticketID'});\n" +
+                "    List<String> types = Arrays.asList(new String[]{\"string\",\"string\"});\n" +
+                "    List<String> variables = Arrays.asList(new String[]{\"date\",\"ticketID\"});\n" +
                 "   List<String> values = Arrays.asList(new String[]{b.getSingleInput(0),b.getSingleInput(1)});\n" +
-                "b.setVarialesToContract(types, variables, values, 'Message_1mi4idx');\n" +
+                "b.setVarialesToContract(types, variables, values, \"Message_1mi4idx\");\n" +
                 " end"+"$"+
-               "rule 'Message_1rnq4x3'\n" +
+               "rule \"Message_1rnq4x3\"\n" +
                 "when\n" +
-                "   b : utils.BlockchainUtils(b.getState('Message_1rnq4x3')==0, b.getState('Message_1mi4idx')==2)\n" +
+                "   b : BlockchainUtils(b.getState(\"Message_1rnq4x3\")==0, b.getState(\"Message_1mi4idx\")==2)\n" +
                 "then\n" +
-                "    List<String> types = Arrays.asList(new String[]{'string'});\n" +
-                "    List<String> variables = Arrays.asList(new String[]{'mod'});\n" +
+                "    List<String> types = Arrays.asList(new String[]{\"string\"});\n" +
+                "    List<String> variables = Arrays.asList(new String[]{\"mod\"});\n" +
                 "   List<String> values = Arrays.asList(new String[]{b.getSingleInput(0)});\n" +
-                "b.setVarialesToContract(types, variables, values, 'Message_1rnq4x3');\n" +
+                "b.setVarialesToContract(types, variables, values, \"Message_1rnq4x3\");\n" +
                 " end";
         return rules;
     }
