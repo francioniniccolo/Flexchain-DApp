@@ -167,10 +167,13 @@ public class BlockchainUtils {
     public void setVarialesToContract(List<String> types, List<String> variables, List<String> values, String messageId) throws Exception {
         //contract.setVariables(stringVar, stringVal, uintVar, uintVal, boolVar, boolVal).send();
        // contract.setVariables(types, variables, values, messageId).send();
-        System.out.println("Variables:"+types+variables+values+messageId);
+        System.out.println("Variables:"+types.toString()+variables.toString()+values.toString()+messageId);
     }
     public String getSingleInput(int index) {
        // return messageInputs.get(index);
         return "capricciosa";
+    }
+    public void setTypes(List<String> types){
+        System.out.println(types);
     }
 }

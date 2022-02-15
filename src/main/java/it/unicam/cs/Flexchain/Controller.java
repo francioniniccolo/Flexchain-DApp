@@ -15,10 +15,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 public class Controller {
-
+    DroolsConfig conf = new DroolsConfig();
     BlockchainUtils utils = new BlockchainUtils();
 
     @GetMapping(value = "/web3j")
@@ -31,28 +32,18 @@ public class Controller {
     }
 
     @GetMapping(value = "/fire")
-    public void fireRules(){
-        KieServices ks = KieServices.Factory.get();
-       KieRepository kr = ks.getRepository();
-        KieFileSystem kfs = ks.newKieFileSystem();
-        try {
-            kfs.write("src/main/resources/r1.drl", new String(Files.readAllBytes(Paths.get("src/main/resources/rules.drl"))));
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        // Add KieFileSystem to KieBuilder
-        KieBuilder kb = ks.newKieBuilder(kfs);
-        kb.buildAll();
-        if (kb.getResults().hasMessages(Message.Level.ERROR)) {
-            throw new RuntimeException("Build Errors:\n" + kb.getResults().toString());
-        }
-        KieContainer kc = ks.newKieContainer(kr.getDefaultReleaseId());
-        KieSession kSession = kc.newKieSession();
-        kSession.insert(utils);
-        kSession.fireAllRules();
-        kSession.dispose();
-        System.out.println("Rules executed");
+    public void fireRules()  {
+        try{
+        KieContainer kieContainer = conf.getKieContainer();
+        KieSession kieSession = kieContainer.newKieSession();
+        kieSession.insert(utils);
+        List types = new ArrayList();
+        List variables = new ArrayList();
+        List values = new ArrayList();
+        kieSession.setGlobal( "types", types );
+        kieSession.setGlobal( "variables", variables );
+        kieSession.setGlobal( "values", values );
+        kieSession.fireAllRules();}catch (Exception e){System.out.println(e.getMessage());}
     }
 
     @GetMapping(value = "/generate-rules")
