@@ -27,6 +27,7 @@ import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -166,10 +167,19 @@ public class BlockchainUtils {
         BigInteger state = new BigInteger("0");
         return state;
     }
-    public void setVarialesToContract(List<String> types, List<String> variables, List<String> values, String messageId) throws Exception {
+    public void setVarialesToContract( List<String> names, List<String> values, String messageId) throws Exception {
         //contract.setVariables(stringVar, stringVal, uintVar, uintVal, boolVar, boolVal).send();
        // contract.setVariables(types, variables, values, messageId).send();
-        System.out.println("Variables:"+types.toString()+variables.toString()+values.toString()+messageId);
+     /*   ArrayList<Bytes32> namesBytes32= new ArrayList<>();
+        ArrayList<Bytes32> valuesBytes32= new ArrayList<>();
+        Iterator<String> namesIterator = names.iterator();
+        Iterator<String> valuesIterator = values.iterator();
+        while (namesIterator.hasNext()){namesBytes32.add(stringToBytes32(namesIterator.next()));}
+        while (valuesIterator.hasNext()){valuesBytes32.add(stringToBytes32(valuesIterator.next()));}
+
+        System.out.println(namesBytes32.get(0).getValue());
+        System.out.println(valuesBytes32.get(0).getValue());*/
+        System.out.println("Variables:"+names.get(0)+values.get(0)+messageId);
     }
     public String getSingleInput(int index) {
        // return messageInputs.get(index);

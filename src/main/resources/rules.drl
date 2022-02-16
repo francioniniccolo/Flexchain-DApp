@@ -1,7 +1,6 @@
 
-import it.unicam.cs.Flexchain.BlockchainUtils
-global java.util.List types;
-global java.util.List variables;
+import it.unicam.cs.Flexchain.BlockchainUtils;
+global java.util.List names;
 global java.util.List values;
 
 dialect  "mvel"
@@ -10,8 +9,7 @@ rule "Message_1pam53q"
 when
    b : BlockchainUtils(b.getState("Message_1pam53q")==0)
 then
-    types.add(new String[]{"string"});
-    variables.add(new String[]{"receipt_id"});
+    names.add(new String[]{"receipt_id"});
     values.add(new String[]{b.getSingleInput(0)});
-    b.setVarialesToContract(types, variables, values, "Message_1pam53q");
+    b.setVarialesToContract(names, values, "Message_1pam53q");
  end

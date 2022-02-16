@@ -45,11 +45,9 @@ public class Controller {
         KieContainer kieContainer = conf.getKieContainer();
         KieSession kieSession = kieContainer.newKieSession();
         kieSession.insert(utils);
-        List types = new ArrayList();
-        List variables = new ArrayList();
+        List names = new ArrayList();
         List values = new ArrayList();
-        kieSession.setGlobal( "types", types );
-        kieSession.setGlobal( "variables", variables );
+        kieSession.setGlobal( "names", names );
         kieSession.setGlobal( "values", values );
         kieSession.fireAllRules();}catch (Exception e){System.out.println(e.getMessage());}
     }
