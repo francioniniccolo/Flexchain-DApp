@@ -26,8 +26,9 @@ public class Controller {
     @GetMapping(value = "/web3j")
     public String getProcess(){
         try {
-            utils.subToMessages("0x560ffc9a3a582be203a33883a5551730ff719ded");
-           return utils.getProcess("diagram.bpmn");
+            utils.subToMessages("0x52c5F7240663D9847F81AD752c1206DFf1e72e42");
+            utils.setContract("0x52c5F7240663D9847F81AD752c1206DFf1e72e42");
+           return utils.getProcess("d0x6c00000000000000000000000000000000000000000000000000000000000000");
         }catch (Exception e){return e.getMessage();}
 
     }
@@ -36,7 +37,7 @@ public class Controller {
     public void conversion(){
      Bytes32 bytes = utils.stringToBytes32("prova");
      System.out.println(bytes.getValue());
-     System.out.println(utils.bytes32ToString(bytes));
+     System.out.println(utils.bytes32ToString(bytes.getValue()));
 }
 
     @GetMapping(value = "/fire")
