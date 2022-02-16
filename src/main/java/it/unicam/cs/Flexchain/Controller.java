@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import org.web3j.abi.datatypes.generated.Bytes32;
 
 @RestController
 public class Controller {
@@ -30,6 +31,13 @@ public class Controller {
         }catch (Exception e){return e.getMessage();}
 
     }
+
+    @GetMapping(value="/bytes")
+    public void conversion(){
+     Bytes32 bytes = utils.stringToBytes32("prova");
+     System.out.println(bytes.getValue());
+     System.out.println(utils.bytes32ToString(bytes));
+}
 
     @GetMapping(value = "/fire")
     public void fireRules()  {

@@ -16,6 +16,7 @@ import org.web3j.protocol.core.methods.response.Web3ClientVersion;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.Contract;
 import org.web3j.tx.gas.DefaultGasProvider;
+import org.web3j.abi.datatypes.generated.Bytes32;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -29,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.apache.commons.codec.binary.StringUtils;
 
 
 public class BlockchainUtils {
@@ -176,4 +178,16 @@ public class BlockchainUtils {
     public void setTypes(List<String> types){
         System.out.println(types);
     }
+
+    public  Bytes32 stringToBytes32(String string) {
+        byte[] byteValue = string.getBytes();
+        byte[] byteValueLen32 = new byte[32];
+        System.arraycopy(byteValue, 0, byteValueLen32, 0, byteValue.length);
+        return new Bytes32(byteValueLen32);
+    }
+     
+    public String bytes32ToString(Bytes32 bytes){
+     return StringUtils.newStringUsAscii(bytes.getValue());
+}
+
 }
