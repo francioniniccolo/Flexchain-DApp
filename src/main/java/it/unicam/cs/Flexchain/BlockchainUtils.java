@@ -167,7 +167,7 @@ public class BlockchainUtils {
         BigInteger state = new BigInteger("0");
         return state;
     }
-    public void setVarialesToContract( List<String> names, List<String> values, String messageId) throws Exception {
+    public void setVariablesToContract( List<String> names, List<String> values, String messageId) throws Exception {
         //contract.setVariables(stringVar, stringVal, uintVar, uintVal, boolVar, boolVal).send();
        // contract.setVariables(types, variables, values, messageId).send();
      /*   ArrayList<Bytes32> namesBytes32= new ArrayList<>();
@@ -179,7 +179,7 @@ public class BlockchainUtils {
 
         System.out.println(namesBytes32.get(0).getValue());
         System.out.println(valuesBytes32.get(0).getValue());*/
-        System.out.println("Variables:"+names.get(0)+values.get(0)+messageId);
+        System.out.println("Variables:"+names+values+messageId);
     }
     public String getSingleInput(int index) {
        // return messageInputs.get(index);

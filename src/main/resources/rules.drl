@@ -9,7 +9,7 @@ rule "Message_1pam53q"
 when
    b : BlockchainUtils(b.getState("Message_1pam53q")==0)
 then
-    names.add(new String[]{"receipt_id"});
-    values.add(new String[]{b.getSingleInput(0)});
-    b.setVarialesToContract(names, values, "Message_1pam53q");
+    names.add("receipt_id");
+    values.add( b.getSingleInput(0));
+    b.setVariablesToContract(names, values, "Message_1pam53q");
  end
