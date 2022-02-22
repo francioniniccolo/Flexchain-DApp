@@ -12,11 +12,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.web3j.abi.datatypes.generated.Bytes32;
+import org.web3j.crypto.Credentials;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.http.HttpService;
+import org.web3j.tx.gas.DefaultGasProvider;
+import org.web3j.utils.Numeric;
 
 @RestController
 public class Controller {
@@ -26,8 +34,8 @@ public class Controller {
     @GetMapping(value = "/web3j")
     public String getProcess(){
         try {
-            utils.subToMessages("0x52c5F7240663D9847F81AD752c1206DFf1e72e42");
-            utils.setContract("0x52c5F7240663D9847F81AD752c1206DFf1e72e42");
+            utils.subToMessages("0x7e6A4d006d377bC317e18cCaAA32D714A3Ef008C");
+            utils.setContract("0x7e6A4d006d377bC317e18cCaAA32D714A3Ef008C");
            return utils.getProcess("d0x6c00000000000000000000000000000000000000000000000000000000000000");
         }catch (Exception e){return e.getMessage();}
 
@@ -35,13 +43,42 @@ public class Controller {
 
     @GetMapping(value="/bytes")
     public void conversion(){
-     Bytes32 bytes = utils.stringToBytes32("prova");
-     System.out.println(bytes.getValue());
-     System.out.println(utils.bytes32ToString(bytes.getValue()));
-}
+       Web3j web3j=Web3j.build(new HttpService("http://localhost:7545"));
+        Process contract =Process.load("0x7e6A4d006d377bC317e18cCaAA32D714A3Ef008C",web3j, Credentials.create("ed7692e730a79c44eec5f0d925c29d8bb5944d37f744b88488d0b80a2c91b521"), new DefaultGasProvider());
+
+        String stringa = "stringa";
+        int stringLength = stringa.length();
+        int fixedLength = 32;
+        for (int i = 0; i<fixedLength-stringLength;i++) {
+            stringa = stringa.concat("0");
+            System.out.println(i);
+        }
+
+        byte[] b = stringa.getBytes(StandardCharsets.UTF_8);
+        //byte[] b = {61,62,63,64,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00};
+        System.out.println(b.length);
+        List<byte[]>types = Arrays.asList(b);
+        List<byte[]>types2 = Arrays.asList(b);
+        try {
+            contract.setVariables(types, types2, "ciao").send();
+        }catch (Exception e){System.out.println(e.getMessage());}
+    }
+
+    public static String asciiToHex(String asciiValue)
+    {
+        char[] chars = asciiValue.toCharArray();
+        StringBuffer hex = new StringBuffer();
+        for (int i = 0; i < chars.length; i++)
+        {
+            hex.append(Integer.toHexString((int) chars[i]));
+        }
+
+        return hex.toString() + "".join("", Collections.nCopies(32 - (hex.length()/2), "00"));
+    }
 
     @GetMapping(value = "/fire")
     public void fireRules()  {
+        utils.setContract("0x7e6A4d006d377bC317e18cCaAA32D714A3Ef008C");
         try{
         KieContainer kieContainer = conf.getKieContainer();
         KieSession kieSession = kieContainer.newKieSession();
