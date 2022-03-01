@@ -34,8 +34,8 @@ public class Controller {
     @GetMapping(value = "/web3j")
     public String getProcess(){
         try {
-            utils.subToMessages("0x9e73C893c73FBE5748f2A13FaF16083799da8E74");
-            utils.setContract("0x9e73C893c73FBE5748f2A13FaF16083799da8E74");
+            utils.subToMessages("0xf809fb0c11037b2d0586976e0993a2d44a0fd753");
+            utils.setContract("0xf809fb0c11037b2d0586976e0993a2d44a0fd753");
            return "address: "+ utils.getProcess("diagram.bpmn");
         }catch (Exception e){return e.getMessage();}
 
@@ -43,7 +43,7 @@ public class Controller {
 
     @GetMapping(value="/bytes")
     public void conversion(){
-        utils.setContract("0x9e73C893c73FBE5748f2A13FaF16083799da8E74");
+        utils.setContract("0xf809fb0c11037b2d0586976e0993a2d44a0fd753");
         utils.getVariable();
     }
 

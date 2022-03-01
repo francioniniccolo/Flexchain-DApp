@@ -3,6 +3,8 @@ package it.unicam.cs.Flexchain;
 
 import io.ipfs.api.IPFS;
 import io.ipfs.multihash.Multihash;
+import it.unicam.cs.Flexchain.wrappers.Monitor;
+import it.unicam.cs.Flexchain.wrappers.Process;
 import org.apache.commons.codec.binary.Hex;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -13,7 +15,6 @@ import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.RemoteFunctionCall;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.abi.datatypes.generated.Bytes32;
@@ -43,7 +44,7 @@ public class BlockchainUtils {
     }
 
     public void setContract(String address) {
-        contract = Process.load(address, web3j, Credentials.create("e8c7a030322ba4b5af330ec1c9907bac191df16793c0bdaaabee91c2693784a9"), new DefaultGasProvider());
+        contract = Process.load(address, web3j, Credentials.create("e877cff34cad69f290baccc857c9e00d1c6a19f30c049fa2cd00fdbdd4ebad7a"), new DefaultGasProvider());
     }
 
     public String getProcess(String processName) throws Exception {
@@ -55,7 +56,7 @@ public class BlockchainUtils {
     }
 
     public void subToMessages(String address) throws Exception {
-        Process contract = Process.load(address, web3j, Credentials.create("e8c7a030322ba4b5af330ec1c9907bac191df16793c0bdaaabee91c2693784a9"), new DefaultGasProvider());
+        Process contract = Process.load(address, web3j, Credentials.create("e877cff34cad69f290baccc857c9e00d1c6a19f30c049fa2cd00fdbdd4ebad7a"), new DefaultGasProvider());
         BigInteger latestBlock = getLatestBlockNumber();
         System.out.println("Listening from block number: " + latestBlock);
 
@@ -113,7 +114,7 @@ public class BlockchainUtils {
 
 
     private Monitor getMonitor() {
-        Monitor monitor = Monitor.load("0x2430Dd4e80DE0d8269f9842dE35C2653d64Be460", web3j, Credentials.create("e8c7a030322ba4b5af330ec1c9907bac191df16793c0bdaaabee91c2693784a9"), new DefaultGasProvider());
+        Monitor monitor = Monitor.load("0x7eA7d4cB549661F49B3E14eCfAeDC4381eD59768", web3j, Credentials.create("e877cff34cad69f290baccc857c9e00d1c6a19f30c049fa2cd00fdbdd4ebad7a"), new DefaultGasProvider());
         return monitor;
     }
 

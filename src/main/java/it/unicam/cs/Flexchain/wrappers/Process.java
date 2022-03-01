@@ -1,4 +1,4 @@
-package it.unicam.cs.Flexchain;
+package it.unicam.cs.Flexchain.wrappers;
 
 import io.reactivex.Flowable;
 import io.reactivex.functions.Function;

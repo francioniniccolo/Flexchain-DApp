@@ -1,4 +1,4 @@
-package it.unicam.cs.Flexchain;
+package it.unicam.cs.Flexchain.wrappers;
 
 import java.math.BigInteger;
 import java.util.Arrays;
