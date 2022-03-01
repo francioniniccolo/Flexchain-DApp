@@ -6,11 +6,14 @@ import io.ipfs.multihash.Multihash;
 import org.apache.commons.codec.binary.Hex;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieSession;
 import org.web3j.abi.datatypes.Utf8String;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.RemoteFunctionCall;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.abi.datatypes.generated.Bytes32;
@@ -28,6 +31,7 @@ import org.web3j.utils.Numeric;
 
 public class BlockchainUtils {
 
+    DroolsConfig conf = new DroolsConfig();
     Monitor monitor;
     Web3j web3j;
     BigInteger lastEventBlockNumber = BigInteger.valueOf(0L);
@@ -39,19 +43,19 @@ public class BlockchainUtils {
     }
 
     public void setContract(String address) {
-        contract = Process.load(address, web3j, Credentials.create("73509edef6eb6c72f58a472ce9789c90389699bad9ae52b0557caa7a5d9f2fde"), new DefaultGasProvider());
+        contract = Process.load(address, web3j, Credentials.create("e8c7a030322ba4b5af330ec1c9907bac191df16793c0bdaaabee91c2693784a9"), new DefaultGasProvider());
     }
 
     public String getProcess(String processName) throws Exception {
-        String address = "";
-        if (monitor.isValid()) {
-            address = monitor.getProcess(processName).send();
-        }
-        return address;
+       // if (monitor.isValid()) {
+         String address = monitor.getProcess(processName).send();
+       //  System.out.println(address);
+         return address;
+        //}else{return "Errore!";}
     }
 
     public void subToMessages(String address) throws Exception {
-        Process contract = Process.load(address, web3j, Credentials.create("73509edef6eb6c72f58a472ce9789c90389699bad9ae52b0557caa7a5d9f2fde"), new DefaultGasProvider());
+        Process contract = Process.load(address, web3j, Credentials.create("e8c7a030322ba4b5af330ec1c9907bac191df16793c0bdaaabee91c2693784a9"), new DefaultGasProvider());
         BigInteger latestBlock = getLatestBlockNumber();
         System.out.println("Listening from block number: " + latestBlock);
 
@@ -80,7 +84,8 @@ public class BlockchainUtils {
                         // System.out.println(rules.get(messageId));
 
 
-                        insertToDroolsFile(rules.get(messageId).toString());
+                        //insertToDroolsFile(rules.get(messageId).toString());
+                        fireRules();
 
                     }
                 });
@@ -94,9 +99,21 @@ public class BlockchainUtils {
         bw.close();
     }
 
+    private void fireRules(){
+        try{
+            KieContainer kieContainer = conf.getKieContainer();
+            KieSession kieSession = kieContainer.newKieSession();
+            kieSession.insert(this);
+            List names = new ArrayList();
+            List values = new ArrayList();
+            kieSession.setGlobal( "names", names );
+            kieSession.setGlobal( "values", values );
+            kieSession.fireAllRules();}catch (Exception e){System.out.println(e.getMessage());}
+    }
+
 
     private Monitor getMonitor() {
-        Monitor monitor = Monitor.load("0x734aA77246d20FfcA1d969a6598BfEBf5866e2aa", web3j, Credentials.create("73509edef6eb6c72f58a472ce9789c90389699bad9ae52b0557caa7a5d9f2fde"), new DefaultGasProvider());
+        Monitor monitor = Monitor.load("0x2430Dd4e80DE0d8269f9842dE35C2653d64Be460", web3j, Credentials.create("e8c7a030322ba4b5af330ec1c9907bac191df16793c0bdaaabee91c2693784a9"), new DefaultGasProvider());
         return monitor;
     }
 
@@ -147,6 +164,7 @@ public class BlockchainUtils {
 
         try {
             contract.setVariables(namesBytes, valuesBytes, messageId).send();
+            System.out.println("Variables set");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -176,6 +194,15 @@ public class BlockchainUtils {
 
     public String bytes32ToString(byte[] bytes) {
         return StringUtils.newStringUsAscii(bytes);
+    }
+
+    public void getVariable(){
+        try {
+            byte[] variable = contract.getVariable(stringToBytes32("receipt_id")).send();
+            for (int i=0;i<variable.length;i++){System.out.print(variable[i]);}
+            String s = new String(variable, StandardCharsets.UTF_8);
+            System.out.println(s);
+        }catch (Exception e){System.out.println(e.getMessage());}
     }
 
 

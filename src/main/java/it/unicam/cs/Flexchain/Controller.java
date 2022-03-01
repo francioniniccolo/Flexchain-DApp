@@ -34,36 +34,17 @@ public class Controller {
     @GetMapping(value = "/web3j")
     public String getProcess(){
         try {
-            utils.subToMessages("0x35DA54D6d124eC462988492Def458BE53C754Cd3");
-            utils.setContract("0x35DA54D6d124eC462988492Def458BE53C754Cd3");
-           return utils.getProcess("diagram.bpmn");
+            utils.subToMessages("0x9e73C893c73FBE5748f2A13FaF16083799da8E74");
+            utils.setContract("0x9e73C893c73FBE5748f2A13FaF16083799da8E74");
+           return "address: "+ utils.getProcess("diagram.bpmn");
         }catch (Exception e){return e.getMessage();}
 
     }
 
     @GetMapping(value="/bytes")
     public void conversion(){
-       Web3j web3j=Web3j.build(new HttpService("http://localhost:7545"));
-       DefaultGasProvider d = new DefaultGasProvider();
-       System.out.println(d.getGasLimit());
-       Process contract =Process.load("0x305e7f75b99C7238e532959E5A43FDC501779379",web3j, Credentials.create("e53693981918f8e49cacbaf17351335d97ebcb06469c43e6df04adcc6650ae1b"), d);
-
-        String stringa = "stringa";
-        int stringLength = stringa.length();
-        int fixedLength = 32;
-        for (int i = 0; i<fixedLength-stringLength;i++) {
-            stringa = stringa.concat("0");
-            System.out.println(i);
-        }
-
-        byte[] b = stringa.getBytes(StandardCharsets.UTF_8);
-        //byte[] b = {61,62,63,64,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00};
-        System.out.println(b.length);
-        List<byte[]>types = Arrays.asList(b);
-        List<byte[]>types2 = Arrays.asList(b);
-        try {
-           System.out.println(contract.setVariables(types, types2, "ciao").send().getGasUsed());
-        }catch (Exception e){System.out.println(e.getMessage());}
+        utils.setContract("0x9e73C893c73FBE5748f2A13FaF16083799da8E74");
+        utils.getVariable();
     }
 
 
