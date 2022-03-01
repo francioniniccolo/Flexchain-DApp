@@ -28,65 +28,60 @@ import org.web3j.utils.Numeric;
 
 public class BlockchainUtils {
 
-      Monitor monitor;
-      Web3j web3j;
-     BigInteger lastEventBlockNumber = BigInteger.valueOf(0L);
-      Process contract;
-    public BlockchainUtils(){
-        web3j=getWeb3j();
-        monitor=getMonitor();
+    Monitor monitor;
+    Web3j web3j;
+    BigInteger lastEventBlockNumber = BigInteger.valueOf(0L);
+    Process contract;
+
+    public BlockchainUtils() {
+        web3j = getWeb3j();
+        monitor = getMonitor();
     }
 
-    public void setContract(String address){
-         contract = Process.load(address,web3j, Credentials.create("ed7692e730a79c44eec5f0d925c29d8bb5944d37f744b88488d0b80a2c91b521"), new DefaultGasProvider());
+    public void setContract(String address) {
+        contract = Process.load(address, web3j, Credentials.create("73509edef6eb6c72f58a472ce9789c90389699bad9ae52b0557caa7a5d9f2fde"), new DefaultGasProvider());
     }
 
     public String getProcess(String processName) throws Exception {
-       String address="";
-        if(monitor.isValid()){
-            address = monitor.getProcess(stringToBytes32(processName).getValue()).send();
+        String address = "";
+        if (monitor.isValid()) {
+            address = monitor.getProcess(processName).send();
         }
         return address;
     }
 
     public void subToMessages(String address) throws Exception {
-        Process contract = Process.load(address,web3j, Credentials.create("ed7692e730a79c44eec5f0d925c29d8bb5944d37f744b88488d0b80a2c91b521"), new DefaultGasProvider());
+        Process contract = Process.load(address, web3j, Credentials.create("73509edef6eb6c72f58a472ce9789c90389699bad9ae52b0557caa7a5d9f2fde"), new DefaultGasProvider());
         BigInteger latestBlock = getLatestBlockNumber();
         System.out.println("Listening from block number: " + latestBlock);
 
         contract.messageExecuteEventFlowable(DefaultBlockParameter.valueOf(latestBlock), DefaultBlockParameterName.LATEST).
-                subscribe( (eventResponse) -> {
+                subscribe((eventResponse) -> {
                     System.out.println("Listening from block number: " + latestBlock);
                     int checkLastEvent = lastEventBlockNumber.compareTo(eventResponse.log.getBlockNumber());
-                    if( checkLastEvent == -1) {
+                    if (checkLastEvent == -1) {
                         lastEventBlockNumber = eventResponse.log.getBlockNumber();
                         String messageId = eventResponse.messageId;
                         ArrayList inputs = (ArrayList) eventResponse.inputs;
                         List<String> stringList = new ArrayList<>();
-                        for(int i = 0; i < inputs.size(); i++) {
+                        for (int i = 0; i < inputs.size(); i++) {
                             byte[] byteValue = ((Utf8String) inputs.get(i)).getValue().getBytes(StandardCharsets.UTF_8);
                             String stringValue = new String(byteValue, StandardCharsets.UTF_8);
                             stringList.add(stringValue);
                             System.out.println("valore in stringa: " + stringValue);
                         }
                         System.out.println(messageId);
-                        String hash_rules = bytes32ToString(contract.getRulesIpfs().send());
-                        String hash_ids = bytes32ToString(contract.getIdsIpfs().send());
+                        String hash_rules = contract.getRulesIpfs().send();
+                        String hash_ids = contract.getIdsIpfs().send();
                         System.out.println(hash_rules);
-                       //JSONObject rules = getRulesFromIpfs(hash_rules,hash_ids);
-                       HashMap rules = getRulesFromIpfs(hash_rules,hash_ids);
-                       String rule="Vuota";
-                      // System.out.println(rules.get(messageId));
+                        //JSONObject rules = getRulesFromIpfs(hash_rules,hash_ids);
+                        HashMap rules = getRulesFromIpfs(hash_rules, hash_ids);
+                        String rule = "Vuota";
+                        // System.out.println(rules.get(messageId));
 
 
+                        insertToDroolsFile(rules.get(messageId).toString());
 
-                       insertToDroolsFile( rules.get(messageId).toString());
-                      /*  u.insertRules(blockchainUtil.getRule(messageId));
-                        System.out.println(lastEventBlockNumber);
-                        blockchainUtil.setMessageInputs(stringList);
-                        blockchainUtil.getRule(messageId);
-                        //System.out.println(blockchainUtil.getSingleInput(1));
-                        executeMessage(blockchainUtil);*/
                     }
                 });
     }
@@ -101,14 +96,15 @@ public class BlockchainUtils {
 
 
     private Monitor getMonitor() {
-        Monitor monitor = Monitor.load("0xbBB97FF7E3b2E2df769c77459b048081B0790954", web3j, Credentials.create("ed7692e730a79c44eec5f0d925c29d8bb5944d37f744b88488d0b80a2c91b521"), new DefaultGasProvider());
+        Monitor monitor = Monitor.load("0x734aA77246d20FfcA1d969a6598BfEBf5866e2aa", web3j, Credentials.create("73509edef6eb6c72f58a472ce9789c90389699bad9ae52b0557caa7a5d9f2fde"), new DefaultGasProvider());
         return monitor;
     }
 
-    private Web3j getWeb3j(){
+    private Web3j getWeb3j() {
         Web3j web3j = Web3j.build(new HttpService("http://localhost:7545"));
         return web3j;
     }
+
     public BigInteger getLatestBlockNumber() throws Exception {
         return web3j.ethGetBlockByNumber(DefaultBlockParameterName.LATEST, false).send().getBlock().getNumber();
     }
@@ -121,96 +117,66 @@ public class BlockchainUtils {
         byte[] fileContentsIds = ipfs.cat(filePointerToIds);
         String resultRules = new String(fileContentsRules);
         String resultIds = new String(fileContentsIds);
-         JSONArray jaRules = new JSONArray(resultRules);
-         JSONArray jaIds = new JSONArray(resultIds);
-         System.out.println(jaRules.getString(0));
-         JSONObject jo = new JSONObject();
+        JSONArray jaRules = new JSONArray(resultRules);
+        JSONArray jaIds = new JSONArray(resultIds);
+        System.out.println(jaRules.getString(0));
+        JSONObject jo = new JSONObject();
         HashMap map = new HashMap();
-         for (int i=0;i<jaRules.length();i++){
-             map.put(jaIds.get(i).toString(),jaRules.getString(i));
-             //jo.append(jaIds.get(i).toString(),jaRules.getString(i));
-         }
-         return map;
-
-    }
-
-    public void insertRules(String rule) throws Exception {
-       /* FileWriter wChor = new FileWriter(getRulesFile());
-        BufferedWriter bChor = new BufferedWriter(wChor);
-
-
-
-        String data = " ";
-		*//* for (String rule: rules) {
-            data += rule;
-        }*//*
-        String initial = "import java.util.List\n" +
-                "import java.util.Arrays\n" +
-                "import org.example.BlockchainUtils\n\n";
-        bChor.write(initial + rule);
-        bChor.flush();
-        bChor.close();*/
+        for (int i = 0; i < jaRules.length(); i++) {
+            map.put(jaIds.get(i).toString(), jaRules.getString(i));
+            //jo.append(jaIds.get(i).toString(),jaRules.getString(i));
+        }
+        return map;
 
     }
 
     public BigInteger getState(String variable) throws Exception {
-       // BigInteger state = contract.getMessage(variable).send();
-       // return state;
+        // BigInteger state = contract.getMessage(variable).send();
+        // return state;
         BigInteger state = new BigInteger("0");
         return state;
     }
-    public void setVariablesToContract( List<String> names, List<String> values, String messageId) throws Exception {
-       /* //contract.setVariables(stringVar, stringVal, uintVar, uintVal, boolVar, boolVal).send();
-       ArrayList<byte[]> namesBytes32= new ArrayList<>();
-        ArrayList<byte[]> valuesBytes32= new ArrayList<>();
+
+    public void setVariablesToContract(List<String> names, List<String> values, String messageId) throws Exception {
+        List<byte[]> namesBytes = new ArrayList<>();
+        List<byte[]> valuesBytes = new ArrayList<>() ;
         Iterator<String> namesIterator = names.iterator();
         Iterator<String> valuesIterator = values.iterator();
-        while (namesIterator.hasNext()){namesBytes32.add(encode(namesIterator.next()).getValue());}
-        while (valuesIterator.hasNext()){valuesBytes32.add(encode(valuesIterator.next()).getValue());}
+        while (namesIterator.hasNext()){namesBytes.add(stringToBytes32(namesIterator.next()));}
+        while (valuesIterator.hasNext()){valuesBytes.add(stringToBytes32(valuesIterator.next()));}
 
-        System.out.println(namesBytes32.get(0));
-        System.out.println(valuesBytes32.get(0));
-        System.out.println("Variables:"+names+values+messageId);
         try {
-            contract.setVariables( namesBytes32, valuesBytes32, messageId).send();
-        }catch (Exception e){System.out.println(e.getMessage());}*/
-        String stringa = "stringa";
-        int stringLength = stringa.length();
-        int fixedLength = 32;
-        for (int i = 0; i<fixedLength-stringLength;i++) {
-            stringa = stringa.concat("0");
-            System.out.println(i);
+            contract.setVariables(namesBytes, valuesBytes, messageId).send();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
 
-        byte[] b = stringa.getBytes(StandardCharsets.UTF_8);
-        //byte[] b = {61,62,63,64,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00};
-        System.out.println(b.length);
-        List<byte[]>types = Arrays.asList(b);
-        List<byte[]>types2 = Arrays.asList(b);
-        try {
-            contract.setVariables(types, types2, "ciao").send();
-        }catch (Exception e){System.out.println(e.getMessage());}
-
 
     }
+
     public String getSingleInput(int index) {
-       // return messageInputs.get(index);
+        // return messageInputs.get(index);
         return "capricciosa";
     }
-    public void setTypes(List<String> types){
+
+    public void setTypes(List<String> types) {
         System.out.println(types);
     }
 
-    public  Bytes32 stringToBytes32(String string) {
-        byte[] byteValue = string.getBytes();
-        byte[] byteValueLen32 = new byte[32];
-        System.arraycopy(byteValue, 0, byteValueLen32, 0, byteValue.length);
-        return new Bytes32(byteValueLen32);
+    public byte[] stringToBytes32(String string) {
+
+        int stringLength = string.length();
+        int fixedLength = 32;
+        for (int i = 0; i < fixedLength - stringLength; i++) {
+            string = string.concat("0");
+        }
+        byte[] b = string.getBytes(StandardCharsets.UTF_8);
+        return b;
     }
-     
-    public String bytes32ToString(byte[] bytes){
-     return StringUtils.newStringUsAscii(bytes);
-}
+
+    public String bytes32ToString(byte[] bytes) {
+        return StringUtils.newStringUsAscii(bytes);
+    }
 
 
     //Converte la stringa esadecimale in byte[]
@@ -223,13 +189,13 @@ public class BlockchainUtils {
     }
 
     //Inserisce 0x + tanti 0 quanti sono necessari per arrivare a 64bit
-    public String addPadding(String s){
+    public String addPadding(String s) {
         StringBuilder str = new StringBuilder(s);
-        int totPad=64-s.length();
-        for (int i=0;i<totPad;i++){
-            str.insert(0,'0');
+        int totPad = 64 - s.length();
+        for (int i = 0; i < totPad; i++) {
+            str.insert(0, '0');
         }
-        str.insert(0,"0x");
+        str.insert(0, "0x");
         return str.toString();
     }
 

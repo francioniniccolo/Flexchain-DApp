@@ -34,9 +34,9 @@ public class Controller {
     @GetMapping(value = "/web3j")
     public String getProcess(){
         try {
-            utils.subToMessages("0x7e6A4d006d377bC317e18cCaAA32D714A3Ef008C");
-            utils.setContract("0x7e6A4d006d377bC317e18cCaAA32D714A3Ef008C");
-           return utils.getProcess("d0x6c00000000000000000000000000000000000000000000000000000000000000");
+            utils.subToMessages("0x35DA54D6d124eC462988492Def458BE53C754Cd3");
+            utils.setContract("0x35DA54D6d124eC462988492Def458BE53C754Cd3");
+           return utils.getProcess("diagram.bpmn");
         }catch (Exception e){return e.getMessage();}
 
     }
@@ -44,7 +44,9 @@ public class Controller {
     @GetMapping(value="/bytes")
     public void conversion(){
        Web3j web3j=Web3j.build(new HttpService("http://localhost:7545"));
-        Process contract =Process.load("0x7e6A4d006d377bC317e18cCaAA32D714A3Ef008C",web3j, Credentials.create("ed7692e730a79c44eec5f0d925c29d8bb5944d37f744b88488d0b80a2c91b521"), new DefaultGasProvider());
+       DefaultGasProvider d = new DefaultGasProvider();
+       System.out.println(d.getGasLimit());
+       Process contract =Process.load("0x305e7f75b99C7238e532959E5A43FDC501779379",web3j, Credentials.create("e53693981918f8e49cacbaf17351335d97ebcb06469c43e6df04adcc6650ae1b"), d);
 
         String stringa = "stringa";
         int stringLength = stringa.length();
@@ -60,25 +62,13 @@ public class Controller {
         List<byte[]>types = Arrays.asList(b);
         List<byte[]>types2 = Arrays.asList(b);
         try {
-            contract.setVariables(types, types2, "ciao").send();
+           System.out.println(contract.setVariables(types, types2, "ciao").send().getGasUsed());
         }catch (Exception e){System.out.println(e.getMessage());}
     }
 
-    public static String asciiToHex(String asciiValue)
-    {
-        char[] chars = asciiValue.toCharArray();
-        StringBuffer hex = new StringBuffer();
-        for (int i = 0; i < chars.length; i++)
-        {
-            hex.append(Integer.toHexString((int) chars[i]));
-        }
-
-        return hex.toString() + "".join("", Collections.nCopies(32 - (hex.length()/2), "00"));
-    }
 
     @GetMapping(value = "/fire")
     public void fireRules()  {
-        utils.setContract("0x7e6A4d006d377bC317e18cCaAA32D714A3Ef008C");
         try{
         KieContainer kieContainer = conf.getKieContainer();
         KieSession kieSession = kieContainer.newKieSession();

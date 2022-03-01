@@ -108,6 +108,25 @@ export const TEMPLATE_ABI=[
     {
         "inputs": [
             {
+                "internalType": "bytes32",
+                "name": "name",
+                "type": "bytes32"
+            }
+        ],
+        "name": "getVariable",
+        "outputs": [
+            {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
                 "internalType": "string",
                 "name": "rules_hash",
                 "type": "string"
@@ -126,38 +145,24 @@ export const TEMPLATE_ABI=[
     {
         "inputs": [
             {
-                "internalType": "string[]",
+                "internalType": "bytes32[]",
                 "name": "names",
-                "type": "string[]"
+                "type": "bytes32[]"
             },
             {
                 "internalType": "bytes32[]",
                 "name": "values",
                 "type": "bytes32[]"
+            },
+            {
+                "internalType": "string",
+                "name": "messageID",
+                "type": "string"
             }
         ],
         "name": "setVariables",
         "outputs": [],
         "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "string",
-                "name": "s",
-                "type": "string"
-            }
-        ],
-        "name": "stringToUint",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "result",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "pure",
         "type": "function"
     }
 ];
