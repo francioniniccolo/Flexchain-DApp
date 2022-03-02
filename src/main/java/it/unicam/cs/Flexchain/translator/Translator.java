@@ -1,9 +1,10 @@
-package it.unicam.cs.Flexchain;
+package it.unicam.cs.Flexchain.translator;
 
 
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.*;
+import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
@@ -18,6 +19,7 @@ public class Translator {
     List<String> rulesList = new ArrayList<>();
     List<String> idList = new ArrayList<>();
 
+    //todo
     public void readModel(File file){
         modelInstance = Bpmn.readModelFromFile(file);
     }
@@ -56,9 +58,9 @@ public class Translator {
                         getPreviousId(flow);
 
                         //create the rule for the request
-                        singleRule += "rule \'" + requestId + "\'\n" +
+                        singleRule += "rule \"" + requestId + "\"\n" +
                                 "when\n" +
-                                "   b : BlockchainUtils(b.getState(\'" + requestId + "\')==0" + orCondition;
+                                "   b : BlockchainUtils(b.getState(\"" + requestId + "\")==0" + orCondition;
                         //if there is a gateway condition to check add it
                         if (!checkForCondition(flow).isEmpty())
                             singleRule += ", " + checkForCondition(flow) + ")\n";
@@ -66,7 +68,7 @@ public class Translator {
                             singleRule += ")\n";
                         singleRule += "then\n" +
                                 "" + createThenPart(getMessageName(requestId), requestId) + "\n " +
-                                "end\n\n";
+                                "end$\n\n";
                         idList.add(requestId);
                         rulesList.add(singleRule);
                         rule += singleRule;
@@ -81,12 +83,12 @@ public class Translator {
                 if(!responseId.isEmpty()) {
                     try {
                         String singleRule = "";
-                        singleRule += "rule \'" + responseId + "\'\n" +
+                        singleRule += "rule \"" + responseId + "\"\n" +
                                 "when\n" +
-                                "   b : BlockchainUtils(b.getState(\'" + responseId + "\')==0, b.getState(\'" + requestId + "\')==2)\n" +
+                                "   b : BlockchainUtils(b.getState(\"" + responseId + "\")==0, b.getState(\"" + requestId + "\")==2)\n" +
                                 "then\n" +
                                 "" + createThenPart(getMessageName(responseId), responseId) + "\n " +
-                                "end\n\n";
+                                "end$\n\n";
                         idList.add(responseId);
                         rulesList.add(singleRule);
                         rule += singleRule;
@@ -111,9 +113,11 @@ public class Translator {
         //now the list contains ["x y", "x1 y1", "x2 y2"];
         List<String> split2 = Arrays.asList(split1[1].split(","));
 
-        String listTypes = "    List<String> types = Arrays.asList(new String[]{";
-        String listNames = "    List<String> variables = Arrays.asList(new String[]{";
-        String listInputs = "   List<String> values = Arrays.asList(new String[]{";
+       // String listTypes = "    List<String> types = Arrays.asList(new String[]{";
+        //String listNames = "    List<String> variables = Arrays.asList(new String[]{";
+        String listNames= "names.add(";
+        //String listInputs = "   List<String> values = Arrays.asList(new String[]{";
+        String listInputs = "values.add(";
 
         for (String param : split2) {
             //now is ["x", "y"]
@@ -125,17 +129,17 @@ public class Translator {
                     buffer.add(c);
                 }
             }
-            //check if the element is the last for the comma after the argument
+          /*  //check if the element is the last for the comma after the argument
             if (split2.indexOf(param) == (split2.size() - 1)) {
                 listTypes += "\'" + buffer.get(0) + "\'";
             } else {
                 listTypes += "\'" + buffer.get(0) + "\',";
-            }
+            }*/
             //same structure but for creating the second list of param names
             if (split2.indexOf(param) == (split2.size() - 1)) {
-                listNames += "\'" + buffer.get(1) + "\'";
+                listNames += "\"" + buffer.get(1) + "\"";
             } else {
-                listNames += "\'" + buffer.get(1) + "\',";
+                listNames += "\"" + buffer.get(1) + "\",";
             }
             //if the element is the last one end otherwise add the comma
             if (split2.indexOf(param) == (split2.size() - 1)) {
@@ -144,12 +148,14 @@ public class Translator {
                 listInputs += "b.getSingleInput(" + split2.indexOf(param) + "),";
             }
         }
-        listTypes += "});\n";
-        listNames += "});\n";
-        listInputs += "});\n";
-        String setVariables = "b.setVarialesToContract(types, variables, values, \'" + messageId + "\');";
+      //  listTypes += "});\n";
+       // listNames += "});\n";
+        listNames += ");\n";
+       // listInputs += "});\n";
+        listInputs += ");\n";
+        String setVariables = "b.setVarialesToContract(variables, values, \"" + messageId + "\");";
 
-        return listTypes + listNames + listInputs + setVariables;
+        return listNames + listInputs + setVariables;
 
     }
 
@@ -205,14 +211,14 @@ public class Translator {
             }
             //depending on the param type a different getter is created
             if(conditionToParse.contains("uint")){
-                getter += "b.getIntFromContract(\'"+buffer.get(1)+"\')" +
+                getter += "b.getIntFromContract(\""+buffer.get(1)+"\")" +
                         ""+buffer.get(2) + buffer.get(3);
             }else if(conditionToParse.contains("string")){
                 //System.out.println("buffer di stringhe: " + buffer);
-                getter += "b.getStringFromContract(\'"+buffer.get(1)+"\')" +
+                getter += "b.getStringFromContract(\""+buffer.get(1)+"\")" +
                         ""+buffer.get(2) + buffer.get(3);
             } else if(conditionToParse.contains("bool")){
-                getter += "b.getBoolFromContract(\'"+buffer.get(1)+"\')" +
+                getter += "b.getBoolFromContract(\""+buffer.get(1)+"\")" +
                         ""+buffer.get(2) + buffer.get(3);
             }
         }
@@ -230,10 +236,10 @@ public class Translator {
             //check if the request or response is empty or is a fake message
             if(!getResponseId(task).isEmpty() && idList.contains(getResponseId(task))){
                 //System.out.println("previous is a response"+ getResponseId(task));
-                orCondition += "b.getState(\'" + getResponseId(task) + "\')==2";
+                orCondition += "b.getState(\"" + getResponseId(task) + "\")==2";
             } else if(!getRequestId(task).isEmpty() && idList.contains(getRequestId(task))){
                 //System.out.println("previous is a request"+ getRequestId(task));
-                orCondition += "b.getState(\'" + getRequestId(task) + "\')==2";
+                orCondition += "b.getState(\"" + getRequestId(task) + "\")==2";
             }
         }
         //if there is a gateway take the incomings flows

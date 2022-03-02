@@ -1,4 +1,4 @@
-package it.unicam.cs.Flexchain;
+package it.unicam.cs.Flexchain.translator;
 
 
 import java.util.ArrayList;

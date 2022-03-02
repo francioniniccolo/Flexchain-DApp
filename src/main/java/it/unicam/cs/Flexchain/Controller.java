@@ -1,5 +1,6 @@
 package it.unicam.cs.Flexchain;
 
+import it.unicam.cs.Flexchain.translator.Translator;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
@@ -7,11 +8,12 @@ import org.kie.api.builder.KieRepository;
 import org.kie.api.builder.Message;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -45,6 +47,26 @@ public class Controller {
     public void conversion(){
         utils.setContract("0xf809fb0c11037b2d0586976e0993a2d44a0fd753");
         utils.getVariable();
+    }
+
+    @GetMapping(value="/translate")
+    public String translate(){
+            Translator t = new Translator();
+            File f = new File("src/main/resources/pizzaDelivery.bpmn");
+            t.readModel(f);
+        try {
+            String rule = t.flowNodeSearch();
+            System.out.println("Regole generate:" + rule);
+            return rule;
+        }catch (Exception e){System.out.println(e.getMessage()); return null;}
+    }
+
+    //todo
+    @PostMapping(value="/translate_post")
+    public void createClient(@RequestBody String file) throws URISyntaxException {
+        //Client savedClient = clientRepository.save(client);
+       //  return ResponseEntity.created(new URI("/clients/" + savedClient.getId())).body(savedClient);
+        System.out.println("Path:"+file);
     }
 
 

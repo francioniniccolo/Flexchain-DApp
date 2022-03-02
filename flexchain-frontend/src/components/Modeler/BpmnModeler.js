@@ -124,13 +124,10 @@ async function downloadFile(modeler) {
    }catch (e){alert("Caricare un diagramma prima del download")}
 }
 
-
+//todo
 function loadDiagram(file, modeler) {
     if (file) {
         const reader = new FileReader();
-        reader.onload = async () => {
-            await modeler.importXML(reader.result);
-        }
         reader.readAsText(file);
 
     }
