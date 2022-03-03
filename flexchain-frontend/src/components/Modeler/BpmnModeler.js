@@ -128,6 +128,9 @@ async function downloadFile(modeler) {
 function loadDiagram(file, modeler) {
     if (file) {
         const reader = new FileReader();
+         reader.onload = async () => {
+             await modeler.importXML(reader.result);
+             }
         reader.readAsText(file);
 
     }
