@@ -27,7 +27,7 @@ export default function BpmnModeler() {
 
     const [modeler, setModeler] = useState();
     const[diagramName,setDiagramName]=useState('diagram.bpmn');
-
+    const[diagramContent,setDiagramContent]=useState('');
     const [show, setShow] = useState(false);
 
     const handleClose = () => setShow(false);
@@ -59,6 +59,21 @@ export default function BpmnModeler() {
         properties.detach();
         properties.attachTo('#panel');
     }
+
+
+    function loadDiagram(file, modeler) {
+
+       if (file) {
+        const reader = new FileReader();
+         reader.onload = async () => {
+             setDiagramContent(reader.result);
+             await modeler.importXML(reader.result);
+             }
+        reader.readAsText(file);
+
+      }
+    }
+
 
 
     return (
@@ -94,7 +109,7 @@ export default function BpmnModeler() {
                     setDiagramName(event.target.files[0].name);
                 }} style={{display: 'none'}}/>
 
-                <Button style={{display: 'inline-block', marginLeft: '30px', height: '54px'}} onClick={() => deployProcessTemplate(diagramName)}>Deploy<TickIcon/></Button>
+                <Button style={{display: 'inline-block', marginLeft: '30px', height: '54px'}} onClick={() => deployProcessTemplate(diagramName,diagramContent)}>Deploy<TickIcon/></Button>
             </div>
 
         </Container>
@@ -124,13 +139,5 @@ async function downloadFile(modeler) {
    }catch (e){alert("Caricare un diagramma prima del download")}
 }
 
-//todo
-function loadDiagram(file, modeler) {
-    if (file) {
-        const reader = new FileReader();
-        reader.readAsText(file);
-
-    }
-}
 
 

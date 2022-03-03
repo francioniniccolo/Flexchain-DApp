@@ -11,11 +11,37 @@ export async function getProcessTemplateABI(){
     return abi.abi;
 }
 
-
-export async function deployProcessTemplate(contractName) {
+//todo
+export async function deployProcessTemplate(contractName,diagramContent) {
     const account = await getSender(web3);
     const contract = new web3.eth.Contract(ABI,MONITOR_ADDRESS);
     await contract.methods.instantiateProcess(contractName).send({from:account});
+
+    const r= await fetch('/translate_post/'+contractName, {
+                  method: 'POST',
+                  body: diagramContent
+                })
+                .then(response => response.text())
+                .then(data => {
+                  console.log('Success:', data);
+                })
+                .catch((error) => {
+                  console.error('Error:', error);
+                });
+
+     const i= await fetch('/translate_post_id/'+contractName, {
+                       method: 'POST',
+                       body: diagramContent
+                     })
+                     .then(response => response.json())
+                     .then(data => {
+                       console.log('Success:', data);
+                     })
+                     .catch((error) => {
+                       console.error('Error:', error);
+                     });
+    console.log("r: "+ r);
+    //console.log("i: "+ await i.text());
 
     const serverRules= await fetch("/generate-rules");
     const serverRulesIds= await fetch("/generate-rules-id");

@@ -1,4 +1,4 @@
-export const MONITOR_ADDRESS="0x7eA7d4cB549661F49B3E14eCfAeDC4381eD59768";
+export const MONITOR_ADDRESS="0x3300BD9210CB019bDD75d749Ee4193462dBB3E94";
 export const ABI=[
                  	{
                  		"inputs": [],

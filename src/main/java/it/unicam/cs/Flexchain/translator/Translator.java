@@ -32,6 +32,11 @@ public class Translator {
         participantsWithoutDuplicates = new ArrayList<>(new HashSet<>(participants));
     }
 
+
+    public List<String> getIdList() {
+        return idList;
+    }
+
     public String flowNodeSearch(){
         String rule = "";
         //get all the sequence flow of the model
@@ -102,7 +107,6 @@ public class Translator {
         }
 
         return rule;
-
     }
 
     public String createThenPart(String messageName, String messageId){
