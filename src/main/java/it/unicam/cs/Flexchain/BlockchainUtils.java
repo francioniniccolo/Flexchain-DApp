@@ -37,6 +37,7 @@ public class BlockchainUtils {
     Web3j web3j;
     BigInteger lastEventBlockNumber = BigInteger.valueOf(0L);
     Process contract;
+    List<String> messageInputs;
 
     public BlockchainUtils() {
         web3j = getWeb3j();
@@ -44,7 +45,7 @@ public class BlockchainUtils {
     }
 
     public void setContract(String address) {
-        contract = Process.load(address, web3j, Credentials.create("907420f4515ebbdf5b5e268af2c520474216683c03094238948e0750fa20b11b"), new DefaultGasProvider());
+        contract = Process.load(address, web3j, Credentials.create("91abfaddf8fda6e4b74975dd24f7844e11d22bab5d2332047bc297aa29d14fb8"), new DefaultGasProvider());
     }
 
     public String getProcess(String processName) throws Exception {
@@ -56,7 +57,7 @@ public class BlockchainUtils {
     }
 
     public void subToMessages(String address) throws Exception {
-        Process contract = Process.load(address, web3j, Credentials.create("907420f4515ebbdf5b5e268af2c520474216683c03094238948e0750fa20b11b"), new DefaultGasProvider());
+        Process contract = Process.load(address, web3j, Credentials.create("91abfaddf8fda6e4b74975dd24f7844e11d22bab5d2332047bc297aa29d14fb8"), new DefaultGasProvider());
         BigInteger latestBlock = getLatestBlockNumber();
         System.out.println("Listening from block number: " + latestBlock);
 
@@ -75,6 +76,7 @@ public class BlockchainUtils {
                             stringList.add(stringValue);
                             System.out.println("valore in stringa: " + stringValue);
                         }
+                        messageInputs=stringList;
                         System.out.println(messageId);
                         String hash_rules = contract.getRulesIpfs().send();
                         String hash_ids = contract.getIdsIpfs().send();
@@ -85,7 +87,7 @@ public class BlockchainUtils {
                         // System.out.println(rules.get(messageId));
 
 
-                        //insertToDroolsFile(rules.get(messageId).toString());
+                        insertToDroolsFile(rules.get(messageId).toString());
                         fireRules();
 
                     }
@@ -114,7 +116,7 @@ public class BlockchainUtils {
 
 
     private Monitor getMonitor() {
-        Monitor monitor = Monitor.load("0x3300BD9210CB019bDD75d749Ee4193462dBB3E94", web3j, Credentials.create("907420f4515ebbdf5b5e268af2c520474216683c03094238948e0750fa20b11b"), new DefaultGasProvider());
+        Monitor monitor = Monitor.load("0x5cC49E7DEfA3F68589E0aE10e13a344a0E83C1b7", web3j, Credentials.create("91abfaddf8fda6e4b74975dd24f7844e11d22bab5d2332047bc297aa29d14fb8"), new DefaultGasProvider());
         return monitor;
     }
 
@@ -150,7 +152,7 @@ public class BlockchainUtils {
 
     public BigInteger getState(String variable) throws Exception {
         // BigInteger state = contract.getMessage(variable).send();
-        // return state;
+       //  return state;
         BigInteger state = new BigInteger("0");
         return state;
     }
@@ -174,8 +176,8 @@ public class BlockchainUtils {
     }
 
     public String getSingleInput(int index) {
-        // return messageInputs.get(index);
-        return "capricciosa";
+         return messageInputs.get(index);
+        //return "capricciosa";
     }
 
     public void setTypes(List<String> types) {
@@ -199,7 +201,7 @@ public class BlockchainUtils {
 
     public void getVariable(){
         try {
-            byte[] variable = contract.getVariable(stringToBytes32("receipt_id")).send();
+            byte[] variable = contract.getVariable(stringToBytes32("diavola")).send();
             for (int i=0;i<variable.length;i++){System.out.print(variable[i]);}
             String s = new String(variable, StandardCharsets.UTF_8);
             System.out.println(s);

@@ -4,7 +4,6 @@ package it.unicam.cs.Flexchain.translator;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.*;
-import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
@@ -37,7 +36,7 @@ public class Translator {
         return idList;
     }
 
-    public String flowNodeSearch(){
+    public List<String> flowNodeSearch(){
         String rule = "";
         //get all the sequence flow of the model
         for(SequenceFlow flow : modelInstance.getModelElementsByType(SequenceFlow.class)){
@@ -65,7 +64,7 @@ public class Translator {
                         //create the rule for the request
                         singleRule += "rule \"" + requestId + "\"\n" +
                                 "when\n" +
-                                "   b : BlockchainUtils(b.getState(\"" + requestId + "\")==0" + orCondition;
+                                "  b : BlockchainUtils(b.getState(\"" + requestId + "\")==0" + orCondition;
                         //if there is a gateway condition to check add it
                         if (!checkForCondition(flow).isEmpty())
                             singleRule += ", " + checkForCondition(flow) + ")\n";
@@ -73,7 +72,7 @@ public class Translator {
                             singleRule += ")\n";
                         singleRule += "then\n" +
                                 "" + createThenPart(getMessageName(requestId), requestId) + "\n " +
-                                "end$\n\n";
+                                "end\n";
                         idList.add(requestId);
                         rulesList.add(singleRule);
                         rule += singleRule;
@@ -90,10 +89,10 @@ public class Translator {
                         String singleRule = "";
                         singleRule += "rule \"" + responseId + "\"\n" +
                                 "when\n" +
-                                "   b : BlockchainUtils(b.getState(\"" + responseId + "\")==0, b.getState(\"" + requestId + "\")==2)\n" +
+                                "  b : BlockchainUtils(b.getState(\"" + responseId + "\")==0, b.getState(\"" + requestId + "\")==2)\n" +
                                 "then\n" +
                                 "" + createThenPart(getMessageName(responseId), responseId) + "\n " +
-                                "end$\n\n";
+                                "end\n";
                         idList.add(responseId);
                         rulesList.add(singleRule);
                         rule += singleRule;
@@ -105,8 +104,8 @@ public class Translator {
 
             }
         }
-
-        return rule;
+        return rulesList;
+       // return rule;
     }
 
     public String createThenPart(String messageName, String messageId){
@@ -119,9 +118,9 @@ public class Translator {
 
        // String listTypes = "    List<String> types = Arrays.asList(new String[]{";
         //String listNames = "    List<String> variables = Arrays.asList(new String[]{";
-        String listNames= "names.add(";
+        String listNames= "    names.add(";
         //String listInputs = "   List<String> values = Arrays.asList(new String[]{";
-        String listInputs = "values.add(";
+        String listInputs = "    values.add(";
 
         for (String param : split2) {
             //now is ["x", "y"]
@@ -157,7 +156,7 @@ public class Translator {
         listNames += ");\n";
        // listInputs += "});\n";
         listInputs += ");\n";
-        String setVariables = "b.setVarialesToContract(variables, values, \"" + messageId + "\");";
+        String setVariables = "    b.setVariablesToContract(names, values, \"" + messageId + "\");";
 
         return listNames + listInputs + setVariables;
 

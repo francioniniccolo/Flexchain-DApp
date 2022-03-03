@@ -7,9 +7,10 @@ dialect  "mvel"
 
 rule "Message_1pam53q"
 when
-   b : BlockchainUtils(b.getState("Message_1pam53q")==0)
+  b : BlockchainUtils(b.getState("Message_1pam53q")==0)
 then
-    names.add("receipt_id");
-    values.add( b.getSingleInput(0));
+    names.add("pizzaOrder");
+    values.add(b.getSingleInput(0));
     b.setVariablesToContract(names, values, "Message_1pam53q");
  end
+

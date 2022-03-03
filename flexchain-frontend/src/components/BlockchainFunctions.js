@@ -16,14 +16,17 @@ export async function deployProcessTemplate(contractName,diagramContent) {
     const account = await getSender(web3);
     const contract = new web3.eth.Contract(ABI,MONITOR_ADDRESS);
     await contract.methods.instantiateProcess(contractName).send({from:account});
+    let gen_rul;
+    let gen_id;
 
     const r= await fetch('/translate_post/'+contractName, {
                   method: 'POST',
                   body: diagramContent
                 })
-                .then(response => response.text())
+                .then(response => response.json())
                 .then(data => {
                   console.log('Success:', data);
+                  gen_rul=data
                 })
                 .catch((error) => {
                   console.error('Error:', error);
@@ -36,19 +39,22 @@ export async function deployProcessTemplate(contractName,diagramContent) {
                      .then(response => response.json())
                      .then(data => {
                        console.log('Success:', data);
+                       gen_id=data;
                      })
                      .catch((error) => {
                        console.error('Error:', error);
                      });
-    console.log("r: "+ r);
-    //console.log("i: "+ await i.text());
+
+    // console.log(gen_rul);
 
     const serverRules= await fetch("/generate-rules");
     const serverRulesIds= await fetch("/generate-rules-id");
     const rul = (await serverRules.text()).split('$')
    const id = (await serverRulesIds.text()).split(',')
-     const hash_rules= await saveRulesToIPFS(JSON.stringify(rul));
-     const hash_ids=  await saveIdsToIPFS(JSON.stringify(id));
+     //const hash_rules= await saveRulesToIPFS(JSON.stringify(rul));
+     const hash_rules= await saveRulesToIPFS(JSON.stringify(gen_rul));
+     //const hash_ids=  await saveIdsToIPFS(JSON.stringify(id));
+     const hash_ids=  await saveIdsToIPFS(JSON.stringify(gen_id));
 
      console.log(hash_rules)
      console.log(hash_ids)

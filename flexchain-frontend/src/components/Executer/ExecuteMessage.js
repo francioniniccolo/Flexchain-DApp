@@ -42,7 +42,16 @@ const ExecuteMessage = () => {
         setContract(cont);
         const ids = await getIds(data);
         setIds(ids);
-
+        const i= await fetch('/messageListener/'+data, {
+            method: 'POST'
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
     }
 
     const getMessage = (message) => {

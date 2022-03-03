@@ -1,14 +1,8 @@
 package it.unicam.cs.Flexchain;
 
 import it.unicam.cs.Flexchain.translator.Translator;
-import org.kie.api.KieServices;
-import org.kie.api.builder.KieBuilder;
-import org.kie.api.builder.KieFileSystem;
-import org.kie.api.builder.KieRepository;
-import org.kie.api.builder.Message;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedWriter;
@@ -16,48 +10,38 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import org.web3j.abi.datatypes.generated.Bytes32;
-import org.web3j.crypto.Credentials;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.http.HttpService;
-import org.web3j.tx.gas.DefaultGasProvider;
-import org.web3j.utils.Numeric;
 
 @RestController
 public class Controller {
     DroolsConfig conf = new DroolsConfig();
     BlockchainUtils utils = new BlockchainUtils();
 
-    @GetMapping(value = "/web3j")
-    public String getProcess(){
+    @PostMapping(value = "/messageListener/{address}")
+    public void getProcess(@PathVariable String address){
         try {
-            utils.subToMessages("0xf809fb0c11037b2d0586976e0993a2d44a0fd753");
-            utils.setContract("0xf809fb0c11037b2d0586976e0993a2d44a0fd753");
-           return "address: "+ utils.getProcess("diagram.bpmn");
-        }catch (Exception e){return e.getMessage();}
+            utils.subToMessages(address);
+            utils.setContract(address);
+           //return "address: "+ utils.getProcess("diagram.bpmn");
+        }catch (Exception e){System.out.println(e.getMessage());}
 
     }
 
     @GetMapping(value="/bytes")
     public void conversion(){
-        utils.setContract("0xf809fb0c11037b2d0586976e0993a2d44a0fd753");
+        utils.setContract("0x2f08c3DA5BD30a20D85661f7602391Ff5fD02358");
         utils.getVariable();
     }
 
     @GetMapping(value="/translate")
-    public String translate(){
+    public List<String> translate(){
             Translator t = new Translator();
             File f = new File("src/main/resources/pizzaDelivery.bpmn");
             t.readModel(f);
         try {
-            String rule = t.flowNodeSearch();
+           // String rule = t.flowNodeSearch();
+            List<String>rule=t.flowNodeSearch();
             System.out.println("Regole generate:" + rule);
             return rule;
         }catch (Exception e){System.out.println(e.getMessage()); return null;}
@@ -65,7 +49,7 @@ public class Controller {
 
     //todo
     @PostMapping(value="/translate_post/{fileName}")
-    public String createClient(@RequestBody String file,@PathVariable String fileName) throws URISyntaxException, IOException {
+    public Object createClient(@RequestBody String file, @PathVariable String fileName) throws URISyntaxException, IOException {
         //Client savedClient = clientRepository.save(client);
        //  return ResponseEntity.created(new URI("/clients/" + savedClient.getId())).body(savedClient);
 
@@ -78,8 +62,10 @@ public class Controller {
             bw.close();
             Translator t = new Translator();
             t.readModel(diagram_file);
-            String rule = t.flowNodeSearch();
+           // String rule = t.flowNodeSearch();
+            List<String>rule=t.flowNodeSearch();
             List<String>ids = t.getIdList();
+            System.out.println(rule);
             return rule;
         }catch (Exception e){System.out.println(e.getMessage());return "Errore nella generazione delle regole";}
     }
@@ -94,7 +80,8 @@ public class Controller {
             File diagram_file = new File("src/main/resources/diagrams/"+fileName);
             Translator t = new Translator();
             t.readModel(diagram_file);
-            String rule = t.flowNodeSearch();
+           // String rule = t.flowNodeSearch();
+            List<String>rule=t.flowNodeSearch();
             List<String>ids = t.getIdList();
             return ids;
         }catch (Exception e){System.out.println(e.getMessage());return null;}
