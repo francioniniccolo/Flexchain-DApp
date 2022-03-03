@@ -11,7 +11,9 @@ import org.kie.api.runtime.KieSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -62,13 +64,41 @@ public class Controller {
     }
 
     //todo
-    @PostMapping(value="/translate_post")
-    public void createClient(@RequestBody String file) throws URISyntaxException {
+    @PostMapping(value="/translate_post/{fileName}")
+    public String createClient(@RequestBody String file,@PathVariable String fileName) throws URISyntaxException, IOException {
         //Client savedClient = clientRepository.save(client);
        //  return ResponseEntity.created(new URI("/clients/" + savedClient.getId())).body(savedClient);
-        System.out.println("Path:"+file);
+
+        try {
+            File diagram_file = new File("src/main/resources/diagrams/"+fileName);
+            FileWriter fw = new FileWriter("src/main/resources/diagrams/"+fileName, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(file);
+            bw.newLine();
+            bw.close();
+            Translator t = new Translator();
+            t.readModel(diagram_file);
+            String rule = t.flowNodeSearch();
+            List<String>ids = t.getIdList();
+            return rule;
+        }catch (Exception e){System.out.println(e.getMessage());return "Errore nella generazione delle regole";}
     }
 
+    //todo
+    @PostMapping(value="/translate_post_id/{fileName}")
+    public List<String> getIds(@RequestBody String file,@PathVariable String fileName) throws URISyntaxException, IOException {
+        //Client savedClient = clientRepository.save(client);
+        //  return ResponseEntity.created(new URI("/clients/" + savedClient.getId())).body(savedClient);
+
+        try {
+            File diagram_file = new File("src/main/resources/diagrams/"+fileName);
+            Translator t = new Translator();
+            t.readModel(diagram_file);
+            String rule = t.flowNodeSearch();
+            List<String>ids = t.getIdList();
+            return ids;
+        }catch (Exception e){System.out.println(e.getMessage());return null;}
+    }
 
     @GetMapping(value = "/fire")
     public void fireRules()  {
