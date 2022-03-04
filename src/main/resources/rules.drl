@@ -3,12 +3,12 @@ global java.util.List names;
 global java.util.List values;
 
 dialect  "mvel"
-rule "Message_1mi4idx"
+rule "Message_1e90tfn"
 when
-  b : BlockchainUtils(b.getState("Message_1mi4idx")==0, b.getState("Message_1pam53q")==2)
+  b : BlockchainUtils(b.getState("Message_1e90tfn")==0,  || b.getState("Message_1j4s0qh")==2)
 then
-    names.add("mess");
+    names.add("products");
     values.add(b.getSingleInput(0));
-    b.setVariablesToContract(names, values, "Message_1mi4idx");
+    b.setVariablesToContract(names, values, "Message_1e90tfn");
  end
 

@@ -30,7 +30,7 @@ public class Controller {
 
     @GetMapping(value="/bytes")
     public void conversion(){
-        utils.setContract("0x2173aF744626df09Aaf4e5423742F2948F49f223");
+        utils.setContract("0xe61dC8c5e53cAC132C4bF27aA680dcb5200F31f6");
         utils.getVariable();
     }
 

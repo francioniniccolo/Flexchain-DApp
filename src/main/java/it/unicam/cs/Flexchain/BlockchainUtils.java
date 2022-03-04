@@ -8,8 +8,13 @@ import it.unicam.cs.Flexchain.wrappers.Process;
 import org.apache.commons.codec.binary.Hex;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.kie.api.KieServices;
+import org.kie.api.builder.KieBuilder;
+import org.kie.api.builder.KieFileSystem;
+import org.kie.api.builder.KieRepository;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
+import org.kie.internal.io.ResourceFactory;
 import org.web3j.abi.datatypes.Utf8String;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
@@ -87,7 +92,18 @@ public class BlockchainUtils {
                         HashMap rules = getRulesFromIpfs(hash_rules, hash_ids);
                         String rule = "Vuota";
                         // System.out.println(rules.get(messageId));
+                        insertToDroolsFile(rules.get(messageId).toString());
+                        KieFileSystem kfs = conf.getKieFileSystem();
+                        KieServices ks = KieServices.Factory.get();
 
+
+                        kfs.write(ResourceFactory.newClassPathResource("rules.drl"));
+
+                        // Add KieFileSystem to KieBuilder
+                        KieBuilder kb = ks.newKieBuilder(kfs);
+
+
+                        kb.buildAll();
 
                         insertToDroolsFile(rules.get(messageId).toString());
                         fireRules();
@@ -167,7 +183,7 @@ public class BlockchainUtils {
     }
 
     public void setVariablesToContract(List<String> names, List<String> values, String messageId) throws Exception {
-        System.out.println("Settting variables...");
+        System.out.println("Setting variables...");
         List<byte[]> namesBytes = new ArrayList<>();
         List<byte[]> valuesBytes = new ArrayList<>() ;
         Iterator<String> namesIterator = names.iterator();

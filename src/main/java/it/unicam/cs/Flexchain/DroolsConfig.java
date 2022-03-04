@@ -17,7 +17,7 @@ public class DroolsConfig {
     private static final String RULES_PATH = "/src/main/resources";
     private KieServices kieServices=KieServices.Factory.get();
 
-    private  KieFileSystem getKieFileSystem() throws IOException{
+    public   KieFileSystem getKieFileSystem() throws IOException{
         KieFileSystem kieFileSystem = kieServices.newKieFileSystem();
         kieFileSystem.write(ResourceFactory.newClassPathResource("rules.drl"));
         return kieFileSystem;
