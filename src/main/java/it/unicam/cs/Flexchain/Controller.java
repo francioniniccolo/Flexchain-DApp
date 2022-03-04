@@ -30,7 +30,7 @@ public class Controller {
 
     @GetMapping(value="/bytes")
     public void conversion(){
-        utils.setContract("0x2f08c3DA5BD30a20D85661f7602391Ff5fD02358");
+        utils.setContract("0x2173aF744626df09Aaf4e5423742F2948F49f223");
         utils.getVariable();
     }
 
@@ -47,7 +47,7 @@ public class Controller {
         }catch (Exception e){System.out.println(e.getMessage()); return null;}
     }
 
-    //todo
+
     @PostMapping(value="/translate_post/{fileName}")
     public Object createClient(@RequestBody String file, @PathVariable String fileName) throws URISyntaxException, IOException {
         //Client savedClient = clientRepository.save(client);
@@ -55,7 +55,7 @@ public class Controller {
 
         try {
             File diagram_file = new File("src/main/resources/diagrams/"+fileName);
-            FileWriter fw = new FileWriter("src/main/resources/diagrams/"+fileName, true);
+            FileWriter fw = new FileWriter("src/main/resources/diagrams/"+fileName, false);
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write(file);
             bw.newLine();
@@ -70,7 +70,7 @@ public class Controller {
         }catch (Exception e){System.out.println(e.getMessage());return "Errore nella generazione delle regole";}
     }
 
-    //todo
+
     @PostMapping(value="/translate_post_id/{fileName}")
     public List<String> getIds(@RequestBody String file,@PathVariable String fileName) throws URISyntaxException, IOException {
         //Client savedClient = clientRepository.save(client);

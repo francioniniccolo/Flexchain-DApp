@@ -1,16 +1,14 @@
-
 import it.unicam.cs.Flexchain.BlockchainUtils;
 global java.util.List names;
 global java.util.List values;
 
 dialect  "mvel"
-
-rule "Message_1pam53q"
+rule "Message_1mi4idx"
 when
-  b : BlockchainUtils(b.getState("Message_1pam53q")==0)
+  b : BlockchainUtils(b.getState("Message_1mi4idx")==0, b.getState("Message_1pam53q")==2)
 then
-    names.add("pizzaOrder");
+    names.add("mess");
     values.add(b.getSingleInput(0));
-    b.setVariablesToContract(names, values, "Message_1pam53q");
+    b.setVariablesToContract(names, values, "Message_1mi4idx");
  end
 

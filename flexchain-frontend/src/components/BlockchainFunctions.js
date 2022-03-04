@@ -11,7 +11,6 @@ export async function getProcessTemplateABI(){
     return abi.abi;
 }
 
-//todo
 export async function deployProcessTemplate(contractName,diagramContent) {
     const account = await getSender(web3);
     const contract = new web3.eth.Contract(ABI,MONITOR_ADDRESS);
