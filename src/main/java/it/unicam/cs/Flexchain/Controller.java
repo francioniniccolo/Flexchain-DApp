@@ -21,16 +21,16 @@ public class Controller {
     @PostMapping(value = "/messageListener/{address}")
     public void getProcess(@PathVariable String address){
         try {
-            utils.subToMessages(address);
             utils.setContract(address);
-           //return "address: "+ utils.getProcess("diagram.bpmn");
+            utils.createDroolsFile();
+            utils.subToMessages(address);
         }catch (Exception e){System.out.println(e.getMessage());}
 
     }
 
     @GetMapping(value="/bytes")
     public void conversion(){
-        utils.setContract("0xe61dC8c5e53cAC132C4bF27aA680dcb5200F31f6");
+        utils.setContract("0x8b49B21a09D43DDDa84caa85565b8632bc8A7763");
         utils.getVariable();
     }
 

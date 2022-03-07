@@ -18,7 +18,7 @@ public class Translator {
     List<String> rulesList = new ArrayList<>();
     List<String> idList = new ArrayList<>();
 
-    //todo
+
     public void readModel(File file){
         modelInstance = Bpmn.readModelFromFile(file);
     }

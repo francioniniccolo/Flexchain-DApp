@@ -7,14 +7,8 @@ import it.unicam.cs.Flexchain.wrappers.Monitor;
 import it.unicam.cs.Flexchain.wrappers.Process;
 import org.apache.commons.codec.binary.Hex;
 import org.json.JSONArray;
-import org.json.JSONObject;
-import org.kie.api.KieServices;
-import org.kie.api.builder.KieBuilder;
-import org.kie.api.builder.KieFileSystem;
-import org.kie.api.builder.KieRepository;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
-import org.kie.internal.io.ResourceFactory;
 import org.web3j.abi.datatypes.Utf8String;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
@@ -30,6 +24,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.codec.binary.StringUtils;
 import org.web3j.utils.Numeric;
@@ -51,7 +46,7 @@ public class BlockchainUtils {
 
     //todo
     public void setContract(String address) {
-        contract = Process.load(address, web3j, Credentials.create("eca855fd79ee07fc071735164321f7e5300ddb0569ce131267460eaffed3c06c"), new DefaultGasProvider());
+        contract = Process.load(address, web3j, Credentials.create("65e5fe1ae05280fae4ec743baf47aa71bb7e37d9a7a87785fa6eae3863211540"), new DefaultGasProvider());
     }
 
     public String getProcess(String processName) throws Exception {
@@ -64,7 +59,7 @@ public class BlockchainUtils {
 
     //todo
     public void subToMessages(String address) throws Exception {
-        Process contract = Process.load(address, web3j, Credentials.create("eca855fd79ee07fc071735164321f7e5300ddb0569ce131267460eaffed3c06c"), new DefaultGasProvider());
+        Process contract = Process.load(address, web3j, Credentials.create("65e5fe1ae05280fae4ec743baf47aa71bb7e37d9a7a87785fa6eae3863211540"), new DefaultGasProvider());
         BigInteger latestBlock = getLatestBlockNumber();
         System.out.println("Listening from block number: " + latestBlock);
 
@@ -85,31 +80,45 @@ public class BlockchainUtils {
                         }
                         messageInputs=stringList;
                         System.out.println(messageId);
-                        String hash_rules = contract.getRulesIpfs().send();
-                        String hash_ids = contract.getIdsIpfs().send();
-                        System.out.println(hash_rules);
-                        //JSONObject rules = getRulesFromIpfs(hash_rules,hash_ids);
-                        HashMap rules = getRulesFromIpfs(hash_rules, hash_ids);
-                        String rule = "Vuota";
+                       // String hash_rules = contract.getRulesIpfs().send();
+                       // String hash_ids = contract.getIdsIpfs().send();
+                        //HashMap rules = getRulesFromIpfs(hash_rules, hash_ids);
+
                         // System.out.println(rules.get(messageId));
-                        insertToDroolsFile(rules.get(messageId).toString());
-                        KieFileSystem kfs = conf.getKieFileSystem();
-                        KieServices ks = KieServices.Factory.get();
+
+                        //insertToDroolsFile(rules.get(messageId).toString());
 
 
-                        kfs.write(ResourceFactory.newClassPathResource("rules.drl"));
-
-                        // Add KieFileSystem to KieBuilder
-                        KieBuilder kb = ks.newKieBuilder(kfs);
-
-
-                        kb.buildAll();
-
-                        insertToDroolsFile(rules.get(messageId).toString());
+                       /* try {
+                            TimeUnit.SECONDS.sleep(2);
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                        }
+                        System.out.println("Interruption finished!");*/
                         fireRules();
 
                     }
                 });
+    }
+
+    public void createDroolsFile() throws Exception {
+        String hash_rules = contract.getRulesIpfs().send();
+        String hash_ids = contract.getIdsIpfs().send();
+        ArrayList<String> rules = getRulesFromIpfs(hash_rules, hash_ids);
+        String header = "import it.unicam.cs.Flexchain.BlockchainUtils;\n" +
+                "global java.util.List names;\n" +
+                "global java.util.List values;\n" +
+                "\n" +
+                "dialect  \"mvel\"";
+        FileWriter fw = new FileWriter("src/main/resources/rules.drl", false);
+        BufferedWriter bw = new BufferedWriter(fw);
+        bw.write(header);
+        for (int i=0;i<rules.size();i++){
+            bw.newLine();
+            bw.write(rules.get(i));
+        }
+        bw.newLine();
+        bw.close();
     }
 
     private void insertToDroolsFile(String rule) throws IOException {
@@ -139,9 +148,9 @@ public class BlockchainUtils {
             kieSession.fireAllRules();}catch (Exception e){System.out.println(e.getMessage());}
     }
 
-
+    //todo
     private Monitor getMonitor() {
-        Monitor monitor = Monitor.load("0xf21413c7fe6a85670202761f07F683891B803577", web3j, Credentials.create("eca855fd79ee07fc071735164321f7e5300ddb0569ce131267460eaffed3c06c"), new DefaultGasProvider());
+        Monitor monitor = Monitor.load("0xFe4A415137D3BCA376c8Cd3Fe252C9DfD2939be3", web3j, Credentials.create("65e5fe1ae05280fae4ec743baf47aa71bb7e37d9a7a87785fa6eae3863211540"), new DefaultGasProvider());
         return monitor;
     }
 
@@ -154,7 +163,7 @@ public class BlockchainUtils {
         return web3j.ethGetBlockByNumber(DefaultBlockParameterName.LATEST, false).send().getBlock().getNumber();
     }
 
-    public HashMap getRulesFromIpfs(String hash_rules, String hash_ids) throws IOException {
+    public ArrayList<String> getRulesFromIpfs(String hash_rules, String hash_ids) throws IOException {
         IPFS ipfs = new IPFS("/dnsaddr/ipfs.infura.io/tcp/5001/https");
         Multihash filePointerToRules = Multihash.fromBase58(hash_rules);
         Multihash filePointerToIds = Multihash.fromBase58(hash_ids);
@@ -164,14 +173,14 @@ public class BlockchainUtils {
         String resultIds = new String(fileContentsIds);
         JSONArray jaRules = new JSONArray(resultRules);
         JSONArray jaIds = new JSONArray(resultIds);
-        System.out.println(jaRules.getString(0));
-        JSONObject jo = new JSONObject();
+        ArrayList<String>list = new ArrayList<>();
         HashMap map = new HashMap();
         for (int i = 0; i < jaRules.length(); i++) {
             map.put(jaIds.get(i).toString(), jaRules.getString(i));
+            list.add(jaRules.getString(i));
             //jo.append(jaIds.get(i).toString(),jaRules.getString(i));
         }
-        return map;
+        return list;
 
     }
 
@@ -227,7 +236,7 @@ public class BlockchainUtils {
 
     public void getVariable(){
         try {
-            byte[] variable = contract.getVariable(stringToBytes32("products")).send();
+            byte[] variable = contract.getVariable(stringToBytes32("filmName")).send();
           //  for (int i=0;i<variable.length;i++){System.out.print(variable[i]);}
             String s = new String(variable, StandardCharsets.UTF_8);
             System.out.println(s);
