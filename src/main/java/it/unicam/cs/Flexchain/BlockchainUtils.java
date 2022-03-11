@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.codec.binary.StringUtils;
 import org.web3j.utils.Numeric;
@@ -46,7 +45,7 @@ public class BlockchainUtils {
 
     //todo
     public void setContract(String address) {
-        contract = Process.load(address, web3j, Credentials.create("65e5fe1ae05280fae4ec743baf47aa71bb7e37d9a7a87785fa6eae3863211540"), new DefaultGasProvider());
+        contract = Process.load(address, web3j, Credentials.create("25f264df7a52e88fe409f6748d511fcdda261eeccd8fa17f618d75d4fc29b86a"), new DefaultGasProvider());
     }
 
     public String getProcess(String processName) throws Exception {
@@ -59,7 +58,7 @@ public class BlockchainUtils {
 
     //todo
     public void subToMessages(String address) throws Exception {
-        Process contract = Process.load(address, web3j, Credentials.create("65e5fe1ae05280fae4ec743baf47aa71bb7e37d9a7a87785fa6eae3863211540"), new DefaultGasProvider());
+        Process contract = Process.load(address, web3j, Credentials.create("25f264df7a52e88fe409f6748d511fcdda261eeccd8fa17f618d75d4fc29b86a"), new DefaultGasProvider());
         BigInteger latestBlock = getLatestBlockNumber();
         System.out.println("Listening from block number: " + latestBlock);
 
@@ -150,7 +149,7 @@ public class BlockchainUtils {
 
     //todo
     private Monitor getMonitor() {
-        Monitor monitor = Monitor.load("0xFe4A415137D3BCA376c8Cd3Fe252C9DfD2939be3", web3j, Credentials.create("65e5fe1ae05280fae4ec743baf47aa71bb7e37d9a7a87785fa6eae3863211540"), new DefaultGasProvider());
+        Monitor monitor = Monitor.load("0x4D24942083BebbF3f2eF5b8228d62acd2c9152Fe", web3j, Credentials.create("25f264df7a52e88fe409f6748d511fcdda261eeccd8fa17f618d75d4fc29b86a"), new DefaultGasProvider());
         return monitor;
     }
 
@@ -191,6 +190,15 @@ public class BlockchainUtils {
        // return state;
     }
 
+    public void getVariableFromContract(String variableName){
+        try {
+            byte[] variable = contract.getVariable(stringToBytes32(variableName)).send();
+            //  for (int i=0;i<variable.length;i++){System.out.print(variable[i]);}
+            String s = new String(variable, StandardCharsets.UTF_8);
+            System.out.println(s);
+        }catch (Exception e){System.out.println(e.getMessage());}
+    }
+
     public void setVariablesToContract(List<String> names, List<String> values, String messageId) throws Exception {
         System.out.println("Setting variables...");
         List<byte[]> namesBytes = new ArrayList<>();
@@ -220,13 +228,15 @@ public class BlockchainUtils {
     }
 
     public byte[] stringToBytes32(String string) {
-
+        StringBuilder str = new StringBuilder(string);
         int stringLength = string.length();
         int fixedLength = 32;
         for (int i = 0; i < fixedLength - stringLength; i++) {
-            string = string.concat("0");
+            str.insert(0, '0');
+           // string = string.concat("0");
         }
-        byte[] b = string.getBytes(StandardCharsets.UTF_8);
+        //byte[] b = string.getBytes(StandardCharsets.UTF_8);
+        byte[] b = str.toString().getBytes(StandardCharsets.UTF_8);
         return b;
     }
 
@@ -236,11 +246,19 @@ public class BlockchainUtils {
 
     public void getVariable(){
         try {
-            byte[] variable = contract.getVariable(stringToBytes32("filmName")).send();
+            byte[] variable = contract.getVariable(stringToBytes32("pizza")).send();
           //  for (int i=0;i<variable.length;i++){System.out.print(variable[i]);}
             String s = new String(variable, StandardCharsets.UTF_8);
-            System.out.println(s);
+            System.out.println(removePadding(s));
         }catch (Exception e){System.out.println(e.getMessage());}
+    }
+
+    public String removePadding(String string){
+        for(int i=0;i<string.length();i++){
+            if(string.charAt(i)==','){ return string.substring(i-1);}
+            if(string.charAt(i)!='0'){ return string.substring(i);}
+        }
+        return "Errore nella rimozione padding";
     }
 
 
