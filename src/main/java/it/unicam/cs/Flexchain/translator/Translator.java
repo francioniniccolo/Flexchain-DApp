@@ -36,6 +36,12 @@ public class Translator {
         return idList;
     }
 
+    public void addToIdList(String idToAdd){
+        if(!idList.contains(idToAdd)){
+            idList.add(idToAdd);
+        }
+    }
+
     public List<String> flowNodeSearch(){
         String rule = "";
         //get all the sequence flow of the model
@@ -73,12 +79,13 @@ public class Translator {
                         singleRule += "then\n" +
                                 "" + createThenPart(getMessageName(requestId), requestId) + "\n " +
                                 "end\n";
-                        idList.add(requestId);
+                       // idList.add(requestId);
+                        addToIdList(requestId);
                         rulesList.add(singleRule);
                         rule += singleRule;
                     } catch(Exception e){
                         System.out.println("fake message detected on the request: " + requestId);
-                        System.out.println("exception: " + e);
+                        e.printStackTrace();
 
                         rule+="";
                     }
@@ -93,7 +100,8 @@ public class Translator {
                                 "then\n" +
                                 "" + createThenPart(getMessageName(responseId), responseId) + "\n " +
                                 "end\n";
-                        idList.add(responseId);
+                        //idList.add(responseId);
+                        addToIdList(responseId);
                         rulesList.add(singleRule);
                         rule += singleRule;
                     } catch(Exception e){
@@ -110,10 +118,10 @@ public class Translator {
 
     public String createThenPart(String messageName, String messageId){
 
-        //assuming message is in format name(x y, x1 y1, x2 y2)
+        //assuming message is in format name(y, y1, ..., yN)
         String replaced1 = messageName.replace(")", "");
         String[] split1 = replaced1.split("\\(");
-        //now the list contains ["x y", "x1 y1", "x2 y2"];
+        //now the list contains ["y", "y1", "...", "yN"];
         List<String> split2 = Arrays.asList(split1[1].split(","));
 
        // String listTypes = "    List<String> types = Arrays.asList(new String[]{";
@@ -123,15 +131,15 @@ public class Translator {
         String listInputs = "    values.add(";
 
         for (String param : split2) {
-            //now is ["x", "y"]
-            String[] params = param.split(" ");
-            List<String> buffer = new ArrayList<>();
+            //now is ["   y   "]
+            String paramName = param.replace(" ", "");
+            //List<String> buffer = new ArrayList<>();
             //check for removing white spaces that confuse the parser
-            for (String c : params) {
+            /*for (String c : params) {
                 if (!c.isEmpty()) {
                     buffer.add(c);
                 }
-            }
+            }*/
           /*  //check if the element is the last for the comma after the argument
             if (split2.indexOf(param) == (split2.size() - 1)) {
                 listTypes += "\'" + buffer.get(0) + "\'";
@@ -140,9 +148,9 @@ public class Translator {
             }*/
             //same structure but for creating the second list of param names
             if (split2.indexOf(param) == (split2.size() - 1)) {
-                listNames += "\"" + buffer.get(1) + "\"";
+                listNames += "\"" + paramName + "\"";
             } else {
-                listNames += "\"" + buffer.get(1) + "\",";
+                listNames += "\"" + paramName + "\",";
             }
             //if the element is the last one end otherwise add the comma
             if (split2.indexOf(param) == (split2.size() - 1)) {
@@ -202,7 +210,8 @@ public class Translator {
         String getter = "";
         ModelElementInstance previous = modelInstance.getModelElementById(flow.getAttributeValue("sourceRef"));
         if(previous instanceof ExclusiveGateway && flow.getName() != null){
-            //condition in format uint x > 5 || string x == "a" || bool x == true
+            //old condition in format uint x > 5 || string x == "a" || bool x == true
+            // x > 5 || x == "a" || x == true
             String conditionToParse = flow.getName();
             String[] params = conditionToParse.split(" ");
             List<String> buffer = new ArrayList<>();
@@ -213,7 +222,7 @@ public class Translator {
                 }
             }
             //depending on the param type a different getter is created
-            if(conditionToParse.contains("uint")){
+            /*if(conditionToParse.contains("uint")){
                 getter += "b.getIntFromContract(\""+buffer.get(1)+"\")" +
                         ""+buffer.get(2) + buffer.get(3);
             }else if(conditionToParse.contains("string")){
@@ -223,7 +232,9 @@ public class Translator {
             } else if(conditionToParse.contains("bool")){
                 getter += "b.getBoolFromContract(\""+buffer.get(1)+"\")" +
                         ""+buffer.get(2) + buffer.get(3);
-            }
+            }*/
+            getter += "b.variableFromContract(\""+buffer.get(0)+"\")" +
+                    ""+buffer.get(1) + buffer.get(2);
         }
         return getter;
     }
@@ -237,21 +248,26 @@ public class Translator {
                 && !(node instanceof EventBasedGateway)){
             ChoreographyTask task = new ChoreographyTask((ModelElementInstanceImpl) node, modelInstance);
             //check if the request or response is empty or is a fake message
-            if(!getResponseId(task).isEmpty() && idList.contains(getResponseId(task))){
-                //System.out.println("previous is a response"+ getResponseId(task));
-                orCondition += "b.getState(\"" + getResponseId(task) + "\")==2";
-            } else if(!getRequestId(task).isEmpty() && idList.contains(getRequestId(task))){
-                //System.out.println("previous is a request"+ getRequestId(task));
-                orCondition += "b.getState(\"" + getRequestId(task) + "\")==2";
+            if(!getResponseId(task).isEmpty()){
+                //if(idList.contains(getResponseId(task))){
+                    //System.out.println("previous is a response"+ getResponseId(task));
+                    orCondition += "b.getState(\"" + getResponseId(task) + "\")==2";
+                //}
+            } else if(!getRequestId(task).isEmpty()) {
+                //if(idList.contains(getRequestId(task))){
+                    //System.out.println("previous is a request"+ getRequestId(task));
+                    orCondition += "b.getState(\"" + getRequestId(task) + "\")==2";
+                //}
             }
+
         }
-        //if there is a gateway take the incomings flows
+        //if there is a gateway take the incoming flows
         // for each incoming take the source and call again the method
         else if(node instanceof ExclusiveGateway){
             List<Object> inc = Arrays.asList(((ExclusiveGateway) node).getIncoming().toArray());
             for (Object f: inc) {
                 //if the element is the latest remove the OR condition
-                //cehck if the gw has more inputs so if the it is a join put the incoming msgs in OR
+                //check if the gw has more inputs so if the it is a join put the incoming msgs in OR
                 getPreviousId((SequenceFlow) f);
                 if(inc.indexOf(f) != (inc.size() -1))
                     orCondition += " || ";
@@ -260,7 +276,7 @@ public class Translator {
             List<Object> inc = Arrays.asList(((ParallelGateway) node).getIncoming().toArray());
             for (Object f: inc) {
                 //if the element is the latest remove the OR condition
-                //cehck if the gw has more inputs so if it is a join put the incoming msgs in AND
+                //check if the gw has more inputs so if it is a join put the incoming msgs in AND
                 getPreviousId((SequenceFlow) f);
                 if(inc.indexOf(f) != (inc.size() -1))
                     orCondition += " && ";
@@ -269,7 +285,7 @@ public class Translator {
             List<Object> inc = Arrays.asList(((EventBasedGateway) node).getIncoming().toArray());
             for (Object f: inc) {
                 //if the element is the latest remove the OR condition
-                //cehck if the gw has more inputs so if it is aN EVENT based put the incoming msgs in OR
+                //check if the gw has more inputs so if it is aN EVENT based put the incoming msgs in OR
                 getPreviousId((SequenceFlow) f);
                 if(inc.indexOf(f) != (inc.size() -1))
                     orCondition += " || ";
