@@ -123,12 +123,13 @@ public class Translator {
         String[] split1 = replaced1.split("\\(");
         //now the list contains ["y", "y1", "...", "yN"];
         List<String> split2 = Arrays.asList(split1[1].split(","));
-
        // String listTypes = "    List<String> types = Arrays.asList(new String[]{";
         //String listNames = "    List<String> variables = Arrays.asList(new String[]{";
         String listNames= "    names.add(";
+        String listNames1="";
         //String listInputs = "   List<String> values = Arrays.asList(new String[]{";
         String listInputs = "    values.add(";
+        String listInputs1="";
 
         for (String param : split2) {
             //now is ["   y   "]
@@ -158,15 +159,18 @@ public class Translator {
             } else {
                 listInputs += "b.getSingleInput(" + split2.indexOf(param) + "),";
             }
+             listNames1+= "    names.add("+"\"" + paramName + "\");\n";
+             listInputs1 += "    values.add("+ "b.getSingleInput(" + split2.indexOf(param) + "));\n";
         }
       //  listTypes += "});\n";
        // listNames += "});\n";
         listNames += ");\n";
        // listInputs += "});\n";
         listInputs += ");\n";
+
         String setVariables = "    b.setVariablesToContract(names, values, \"" + messageId + "\");";
 
-        return listNames + listInputs + setVariables;
+        return listNames1 + listInputs1 + setVariables;
 
     }
 
@@ -233,7 +237,7 @@ public class Translator {
                 getter += "b.getBoolFromContract(\""+buffer.get(1)+"\")" +
                         ""+buffer.get(2) + buffer.get(3);
             }*/
-            getter += "b.variableFromContract(\""+buffer.get(0)+"\")" +
+            getter += "b.getVariableFromContract(\""+buffer.get(0)+"\")" +
                     ""+buffer.get(1) + buffer.get(2);
         }
         return getter;

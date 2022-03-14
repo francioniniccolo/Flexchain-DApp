@@ -30,8 +30,8 @@ public class Controller {
 
     @GetMapping(value="/bytes")
     public void conversion(){
-        utils.setContract("0xA5Cf50d0A5D66B8F663e2A4F83c421a6c90F46af");
-        utils.getVariable();
+        utils.setContract("0x5f43f3AaD18AA08D6439c6f7a957e99dBEEDc1FD");
+        utils.getVariableFromContract("date");
     }
 
     @GetMapping(value="/translate")

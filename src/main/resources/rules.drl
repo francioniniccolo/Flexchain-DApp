@@ -3,30 +3,72 @@ global java.util.List names;
 global java.util.List values;
 
 dialect  "mvel"
-rule "Message_1pam53q"
+rule "Message_0slq9pw"
 when
-  b : BlockchainUtils(b.getState("Message_1pam53q")==0)
+  b : BlockchainUtils(b.getState("Message_0slq9pw")==0)
 then
-    names.add("pizza");
+    names.add("type");
     values.add(b.getSingleInput(0));
-    b.setVariablesToContract(names, values, "Message_1pam53q");
+    b.setVariablesToContract(names, values, "Message_0slq9pw");
  end
 
-rule "Message_1mi4idx"
+rule "Message_1czww7u"
 when
-  b : BlockchainUtils(b.getState("Message_1mi4idx")==0, b.getState("Message_1pam53q")==2)
+  b : BlockchainUtils(b.getState("Message_1czww7u")==0, b.getState("Message_139bxed")==2, b.getVariableFromContract("accepted")==true)
 then
-    names.add("mess");
+    names.add("appointmentId");
     values.add(b.getSingleInput(0));
-    b.setVariablesToContract(names, values, "Message_1mi4idx");
+    b.setVariablesToContract(names, values, "Message_1czww7u");
  end
 
-rule "Message_1rnq4x3"
+rule "Message_1hxitb1"
 when
-  b : BlockchainUtils(b.getState("Message_1rnq4x3")==0, b.getState("Message_1mi4idx")==2)
+  b : BlockchainUtils(b.getState("Message_1hxitb1")==0, b.getState("Message_1czww7u")==2)
 then
-    names.add("p");
+    names.add("registration");
     values.add(b.getSingleInput(0));
-    b.setVariablesToContract(names, values, "Message_1rnq4x3");
+    b.setVariablesToContract(names, values, "Message_1hxitb1");
+ end
+
+rule "Message_1xuet59"
+when
+  b : BlockchainUtils(b.getState("Message_1xuet59")==0, b.getState("Message_1chl1vq")==2)
+then
+    names.add("resultID");
+    values.add(b.getSingleInput(0));
+    b.setVariablesToContract(names, values, "Message_1xuet59");
+ end
+
+rule "Message_1swv7df"
+when
+  b : BlockchainUtils(b.getState("Message_1swv7df")==0, b.getState("Message_0slq9pw")==2 || b.getState("Message_139bxed")==2)
+then
+    names.add("type");
+    names.add("requestId");
+    values.add(b.getSingleInput(0));
+    values.add(b.getSingleInput(1));
+    b.setVariablesToContract(names, values, "Message_1swv7df");
+ end
+
+rule "Message_139bxed"
+when
+  b : BlockchainUtils(b.getState("Message_139bxed")==0, b.getState("Message_1swv7df")==2)
+then
+    names.add("accepted");
+    names.add("date");
+    values.add(b.getSingleInput(0));
+    values.add(b.getSingleInput(1));
+    b.setVariablesToContract(names, values, "Message_139bxed");
+ end
+
+rule "Message_1chl1vq"
+when
+  b : BlockchainUtils(b.getState("Message_1chl1vq")==0, b.getState("Message_1hxitb1")==2, b.getVariableFromContract("registration")==true)
+then
+    names.add("report");
+    names.add("ticketId");
+    values.add(b.getSingleInput(0));
+    values.add(b.getSingleInput(1));
+    b.setVariablesToContract(names, values, "Message_1chl1vq");
  end
 

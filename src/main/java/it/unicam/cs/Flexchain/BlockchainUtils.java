@@ -74,7 +74,9 @@ public class BlockchainUtils {
                         for (int i = 0; i < inputs.size(); i++) {
                             byte[] byteValue = ((Utf8String) inputs.get(i)).getValue().getBytes(StandardCharsets.UTF_8);
                             String stringValue = new String(byteValue, StandardCharsets.UTF_8);
-                            stringList.add(stringValue);
+                            String splitted []  = stringValue.split(",");
+                            stringList.addAll(List.of(splitted));
+                           // stringList.add(stringValue);
                             System.out.println("valore in stringa: " + stringValue);
                         }
                         messageInputs=stringList;
@@ -190,13 +192,15 @@ public class BlockchainUtils {
        // return state;
     }
 
-    public void getVariableFromContract(String variableName){
+    public String getVariableFromContract(String variableName){
         try {
             byte[] variable = contract.getVariable(stringToBytes32(variableName)).send();
             //  for (int i=0;i<variable.length;i++){System.out.print(variable[i]);}
             String s = new String(variable, StandardCharsets.UTF_8);
-            System.out.println(s);
+            System.out.println(removePadding(s));
+            return removePadding(s);
         }catch (Exception e){System.out.println(e.getMessage());}
+        return variableName;
     }
 
     public void setVariablesToContract(List<String> names, List<String> values, String messageId) throws Exception {
@@ -244,14 +248,6 @@ public class BlockchainUtils {
         return StringUtils.newStringUsAscii(bytes);
     }
 
-    public void getVariable(){
-        try {
-            byte[] variable = contract.getVariable(stringToBytes32("pizza")).send();
-          //  for (int i=0;i<variable.length;i++){System.out.print(variable[i]);}
-            String s = new String(variable, StandardCharsets.UTF_8);
-            System.out.println(removePadding(s));
-        }catch (Exception e){System.out.println(e.getMessage());}
-    }
 
     public String removePadding(String string){
         for(int i=0;i<string.length();i++){
