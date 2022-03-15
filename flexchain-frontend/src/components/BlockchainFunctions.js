@@ -75,6 +75,42 @@ export async function deployProcessTemplate(contractName,diagramContent) {
     }*/
 }
 
+export async function generateRules(contractName,diagramContent){
+    let gen_rul;
+    const r= await fetch('/translate_post/'+contractName, {
+        method: 'POST',
+        body: diagramContent
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+            // gen_rul=data;
+            gen_rul= data;
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    return gen_rul;
+}
+
+export async function generateIds(contractName,diagramContent){
+    let gen_id;
+
+    const i= await fetch('/translate_post_id/'+contractName, {
+        method: 'POST',
+        body: diagramContent
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+            gen_id = data;
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    return gen_id;
+}
+
 export function getWeb3() {
     return new Web3(Web3.givenProvider || "ws://localhost:8545");
 }

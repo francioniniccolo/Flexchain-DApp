@@ -12,7 +12,14 @@ import propertiesPanelModule from 'bpmn-js-properties-panel';
 import propertiesProviderModule from 'bpmn-js-properties-panel/lib/provider/bpmn';
 import 'bpmn-js-properties-panel/dist/assets/bpmn-js-properties-panel.css'
 import Offcanvas from "react-bootstrap/Offcanvas";
-import {getDiagramNames, addRules,deleteRules} from "../BlockchainFunctions";
+import {
+    generateIds,
+    generateRules,
+    getDiagramNames, getRules,
+    saveIdsToIPFS,
+    saveRulesToIPFS,
+    setRulesHash
+} from "../BlockchainFunctions";
 import SelectAddress from "../SelectAddress/SelectAddress";
 import { getSender, getWeb3,getIds} from "../BlockchainFunctions";
 import {TEMPLATE_ABI} from "../../contracts/ProcessTemplate";
@@ -26,6 +33,8 @@ export default function Updater() {
     const [modeler, setModeler] = useState();
     const [viewer, setViewer] = useState();
     const [contractAddress, setContractAddress] = useState();
+    const [contractName,setContractName]=useState();
+    const[diagramContent,setDiagramContent]=useState('');
     const [elementsCount, setElementsCount] = useState();
     const [elementRegistry, setElementRegistry] = useState();
 
@@ -78,8 +87,10 @@ export default function Updater() {
 
     function loadDiagram(file, modeler, viewer) {
         if (file) {
+            setContractName(file.name);
             const reader = new FileReader();
             reader.onload = async () => {
+               // setDiagramContent(reader.result);
                 await modeler.importXML(reader.result).then(() => {
                     setElementsCount(getElementRegistry(modeler).length)
                     setElementRegistry(getElementRegistry(modeler));
@@ -102,6 +113,19 @@ export default function Updater() {
         const elements = registry.getAll();
         let check =diagramCheck(ids,elements)
         if (check == true) {alert("Diagramma e contratto non corrispondono")}
+    }
+
+    async function updateRules(address) {
+        const content = await modeler.saveXML({format: true});
+        const rules= await generateRules(contractName, content.xml);
+        const ids = await generateIds(contractName, content.xml);
+        //console.log(rules);
+       // console.log(ids);
+        const hash_rules = await saveRulesToIPFS(JSON.stringify(rules));
+        const hash_ids = await saveIdsToIPFS(JSON.stringify(ids));
+        await setRulesHash(hash_rules, hash_ids, address);
+        console.log(await getIds(address));
+        console.log(await getRules(address));
     }
 
 
@@ -138,10 +162,7 @@ export default function Updater() {
     );
 }
 
-async function updateRules(address){
-    //await addRules(address);
-   // await deleteRules(address);
-}
+
 
 function UploadBtnClicked(upload) {
     upload.click();
