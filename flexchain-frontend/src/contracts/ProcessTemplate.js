@@ -5,6 +5,11 @@ export const TEMPLATE_ABI=[
                 "internalType": "address",
                 "name": "sender",
                 "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_quorum",
+                "type": "uint256"
             }
         ],
         "stateMutability": "nonpayable",
@@ -28,6 +33,59 @@ export const TEMPLATE_ABI=[
         ],
         "name": "messageExecute",
         "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "string",
+                        "name": "proposedHashRules",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "proposedHashIds",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "quorum",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "actualVotes",
+                        "type": "uint256"
+                    }
+                ],
+                "indexed": false,
+                "internalType": "struct ProcessTemplate.Proposal",
+                "name": "p",
+                "type": "tuple"
+            }
+        ],
+        "name": "proposalStatus",
+        "type": "event"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "_proposalHashRules",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "_proposalHashIds",
+                "type": "string"
+            }
+        ],
+        "name": "createProposal",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
         "inputs": [
@@ -163,6 +221,43 @@ export const TEMPLATE_ABI=[
         "name": "setVariables",
         "outputs": [],
         "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bool",
+                "name": "_vote",
+                "type": "bool"
+            }
+        ],
+        "name": "voteProposal",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "voters",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "voted",
+                "type": "bool"
+            },
+            {
+                "internalType": "bool",
+                "name": "vote",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
         "type": "function"
     }
 ];

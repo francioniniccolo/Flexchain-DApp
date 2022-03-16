@@ -13,6 +13,7 @@ import propertiesProviderModule from 'bpmn-js-properties-panel/lib/provider/bpmn
 import 'bpmn-js-properties-panel/dist/assets/bpmn-js-properties-panel.css'
 import Offcanvas from "react-bootstrap/Offcanvas";
 import {
+    createProposal,
     generateIds,
     generateRules,
     getDiagramNames, getRules,
@@ -123,9 +124,10 @@ export default function Updater() {
        // console.log(ids);
         const hash_rules = await saveRulesToIPFS(JSON.stringify(rules));
         const hash_ids = await saveIdsToIPFS(JSON.stringify(ids));
-        await setRulesHash(hash_rules, hash_ids, address);
+        await createProposal(hash_rules, hash_ids, address);
+       /* await setRulesHash(hash_rules, hash_ids, address);
         console.log(await getIds(address));
-        console.log(await getRules(address));
+        console.log(await getRules(address));*/
     }
 
 

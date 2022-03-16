@@ -8,15 +8,25 @@ import Viewer from 'chor-js/lib/NavigatedViewer';
 import {RiUploadCloudFill as IconUpload} from "react-icons/ri";
 import './style.css'
 import {TEMPLATE_ABI} from "../../contracts/ProcessTemplate";
+import Offcanvas from "react-bootstrap/Offcanvas";
+import {GoChevronLeft as RightIcon} from "react-icons/go";
+import EventAccordion from "../EventAccordion/EventAccordion";
 
 const ExecuteMessage = () => {
 
+    const handleClose = () => setShow(false);
+    const handleShow = () => {
+        setShow(true);
+    }
+
+    const [show, setShow] = useState(false);
     const [parameters, setParameters] = useState();
     const [message, setMessage] = useState();
     const [previousMessage, setPreviousMessage] = useState(null);
     const [diagramsList, setDiagramsList] = useState([]);
     const [ids, setIds] = useState([]);
     const [contract, setContract] = useState();
+    const [events,setEvents]=useState();
     const [abi, setAbi] = useState();
     const [address, setAddress] = useState();
     const [viewer, setViewer] = useState();
@@ -40,6 +50,12 @@ const ExecuteMessage = () => {
         setAddress(data)
         const cont = new web3.eth.Contract(TEMPLATE_ABI,data);
         setContract(cont);
+        await cont.getPastEvents('allEvents',
+            {fromBlock: 0,
+            toBlock: 'latest'}, function (error, e) {
+            setEvents(e);
+            console.log(e);
+        });
         const ids = await getIds(data);
         setIds(ids);
         const i= await fetch('/messageListener/'+data, {
@@ -52,6 +68,7 @@ const ExecuteMessage = () => {
             .catch((error) => {
                 console.error('Error:', error);
             });
+
     }
 
     const getMessage = (message) => {
@@ -97,6 +114,18 @@ const ExecuteMessage = () => {
 
     return (
         <Container className='mt-5'>
+
+            <h5 title='Show events panel' style={{fontFamily:'Arial', width:'200px',float:'right'}} className='mt-4' onClick={handleShow} onMouseLeave={(e)=>e.target.style.color='black'} onMouseOver={(e)=>e.target.style.color='grey'}><i>Events Panel</i><RightIcon/></h5>
+
+            <Offcanvas placement={'end'} show={show} onHide={handleClose} >
+                <Offcanvas.Header closeButton>
+                    <Offcanvas.Title>Events Panel</Offcanvas.Title>
+                </Offcanvas.Header>
+                <Offcanvas.Body>
+                 <EventAccordion events={events}/>
+                </Offcanvas.Body>
+            </Offcanvas>
+
             <SelectAddress  diagramsList={diagramsList} childToParent={getAddressFromSelect}/>
             <Form className='mt-4'>
                 <Form.Group as={Row} className="mb-3" controlId="formBasicEmail">

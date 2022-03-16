@@ -18,6 +18,7 @@ import 'bpmn-js-properties-panel/dist/assets/bpmn-js-properties-panel.css'
 import Offcanvas from 'react-bootstrap/Offcanvas'
 import {deployProcessTemplate,deployMonitor} from "../BlockchainFunctions";
 import Alert from '@mui/material/Alert';
+import {Col} from "react-bootstrap";
 
 
 
@@ -26,8 +27,9 @@ import Alert from '@mui/material/Alert';
 export default function BpmnModeler() {
 
     const [modeler, setModeler] = useState();
-    const[diagramName,setDiagramName]=useState('diagram.bpmn');
-    const[diagramContent,setDiagramContent]=useState('');
+    const [diagramName,setDiagramName]=useState('diagram.bpmn');
+    const [diagramContent,setDiagramContent]=useState('');
+    const [quorum,setQuorum]=useState(1);
     const [show, setShow] = useState(false);
 
     const handleClose = () => setShow(false);
@@ -109,9 +111,17 @@ export default function BpmnModeler() {
                     setDiagramName(event.target.files[0].name);
                 }} style={{display: 'none'}}/>
 
-                <Button style={{display: 'inline-block', marginLeft: '30px', height: '54px'}} onClick={() => deployProcessTemplate(diagramName,diagramContent)}>Deploy<TickIcon/></Button>
-            </div>
+                <Button style={{display: 'inline-block', marginLeft: '30px', height: '54px'}} onClick={() => deployProcessTemplate(diagramName,diagramContent,quorum)}>Deploy<TickIcon/></Button>
 
+                    <Form.Label style={{fontFamily:'Arial',marginBottom: '0', marginLeft: '30px'}}>Quorum</Form.Label>
+                    <Form.Control type="number"  style={{width: '10%',display: 'inline-block', marginLeft: '30px'}}
+                                  value={quorum}
+                                  min={1}
+                                  onChange={e => setQuorum(e.target.value)}
+                    />
+
+            </div>
+         <br/>
         </Container>
 
     );

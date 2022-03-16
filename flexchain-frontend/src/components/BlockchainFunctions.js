@@ -11,10 +11,10 @@ export async function getProcessTemplateABI(){
     return abi.abi;
 }
 
-export async function deployProcessTemplate(contractName,diagramContent) {
+export async function deployProcessTemplate(contractName,diagramContent,quorum) {
     const account = await getSender(web3);
     const contract = new web3.eth.Contract(ABI,MONITOR_ADDRESS);
-    await contract.methods.instantiateProcess(contractName).send({from:account});
+    await contract.methods.instantiateProcess(contractName,quorum).send({from:account});
     let gen_rul;
     let gen_id;
 
@@ -173,6 +173,12 @@ export async function getIds(address){
     return await ids.json();
 }
 
+export async function createProposal(hash_rules, hash_ids, address){
+    const account = await getSender(web3);
+    const contract = new web3.eth.Contract(TEMPLATE_ABI,address);
+    await contract.methods.createProposal(hash_rules, hash_ids).send({from: account});
+
+}
 
 
 /*export async function deploy(name, abi, bytecode) {

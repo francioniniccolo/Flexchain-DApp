@@ -15,7 +15,6 @@ const App = ()=>(
         <Route path='/modeler' element={<BpmnModeler/>}/>
           <Route path='/update' element={<Updater/>}/>
           <Route path='/execute' element={<ExecuteMessage/>}/>
-          <Route path='/ipfs' element={<Ipfs/>}/>
       </Routes>
     </Router>
 );
