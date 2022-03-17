@@ -28,23 +28,11 @@ public class Controller {
 
     }
 
-    @GetMapping(value="/bytes")
-    public void conversion(){
-        utils.setContract("0x5f43f3AaD18AA08D6439c6f7a957e99dBEEDc1FD");
-        utils.getVariableFromContract("date");
-    }
-
-    @GetMapping(value="/translate")
-    public List<String> translate(){
-            Translator t = new Translator();
-            File f = new File("src/main/resources/pizzaDelivery.bpmn");
-            t.readModel(f);
-        try {
-           // String rule = t.flowNodeSearch();
-            List<String>rule=t.flowNodeSearch();
-            System.out.println("Regole generate:" + rule);
-            return rule;
-        }catch (Exception e){System.out.println(e.getMessage()); return null;}
+    @GetMapping(value="/getValue/{variableName}/{address}")
+    public String getVariable(@PathVariable String variableName,@PathVariable String address){
+        utils.setContract(address);
+       String res = utils.getVariableFromContract(variableName);
+       return res;
     }
 
 
@@ -87,7 +75,20 @@ public class Controller {
         }catch (Exception e){System.out.println(e.getMessage());return null;}
     }
 
-    @GetMapping(value = "/fire")
+     /* @GetMapping(value="/translate")
+    public List<String> translate(){
+            Translator t = new Translator();
+            File f = new File("src/main/resources/pizzaDelivery.bpmn");
+            t.readModel(f);
+        try {
+           // String rule = t.flowNodeSearch();
+            List<String>rule=t.flowNodeSearch();
+            System.out.println("Regole generate:" + rule);
+            return rule;
+        }catch (Exception e){System.out.println(e.getMessage()); return null;}
+    }*/
+
+  /*  @GetMapping(value = "/fire")
     public void fireRules()  {
         try{
         KieContainer kieContainer = conf.getKieContainer();
@@ -179,5 +180,5 @@ public class Controller {
         return ids;
     }
 
-
+*/
 }

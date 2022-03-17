@@ -1,5 +1,5 @@
 //todo
-export const MONITOR_ADDRESS="0x5c58fb00F0d6A2069649BbFB43d856d88f82b73b";
+export const MONITOR_ADDRESS="0xE87c98e293460784c5E00f7F99862B6548E09a2c";
 export const ABI=[
 	{
 		"inputs": [],
@@ -39,30 +39,16 @@ export const ABI=[
 				"internalType": "string",
 				"name": "processName",
 				"type": "string"
-			}
-		],
-		"name": "getProcessOwner",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "processName",
-				"type": "string"
 			},
 			{
 				"internalType": "uint256",
 				"name": "_quorum",
 				"type": "uint256"
+			},
+			{
+				"internalType": "bool",
+				"name": "isNew",
+				"type": "bool"
 			}
 		],
 		"name": "instantiateProcess",

@@ -4,9 +4,21 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import {Button} from "react-bootstrap";
+import {voteProposal} from "../BlockchainFunctions";
 
 export default function EventAccordion(props) {
 
+   function eventTypeControl(event){
+       if(event.event=="messageExecute"){
+           return (
+               <div>
+                   <b>{"Message ID: "+event.returnValues.messageId}</b>
+                   <br/>
+                   <b>{" \nInputs: "+event.returnValues.inputs}</b>
+           </div>); }
+       if(event.event=="proposalStatus"){return <Button variant="primary" onClick={async ()=>{ await voteProposal(props.address)}}>Vote</Button>}
+   }
 
     return(
         <div>
@@ -16,11 +28,11 @@ export default function EventAccordion(props) {
                     aria-controls="panel1a-content"
                     id="panel1a-header"
                 >
-                    <Typography>Event: {event.event}({/*event.returnValues[0]*/})</Typography>
+                    <Typography>Event: {event.event}</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                     <Typography>
-                        <b>{/*event.returnValues[1]*/}</b>
+                        {eventTypeControl(event)}
                     </Typography>
                 </AccordionDetails>
             </Accordion>))}

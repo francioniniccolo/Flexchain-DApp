@@ -14,7 +14,11 @@ export async function getProcessTemplateABI(){
 export async function deployProcessTemplate(contractName,diagramContent,quorum) {
     const account = await getSender(web3);
     const contract = new web3.eth.Contract(ABI,MONITOR_ADDRESS);
-    await contract.methods.instantiateProcess(contractName,quorum).send({from:account});
+    const names= await contract.methods.getDiagramNames().call();
+    console.log(names);
+    let isNew = true;
+    if(names.includes(contractName)){isNew=false;}
+    await contract.methods.instantiateProcess(contractName,quorum,isNew).send({from:account});
     let gen_rul;
     let gen_id;
 
@@ -179,7 +183,13 @@ export async function createProposal(hash_rules, hash_ids, address){
     await contract.methods.createProposal(hash_rules, hash_ids).send({from: account});
 
 }
-
+export async function voteProposal(address) {
+    const account = await getSender(web3);
+    const contract = new web3.eth.Contract(TEMPLATE_ABI, address);
+    try {
+        await contract.methods.voteProposal(true).send({from: account});
+    } catch(err){console.log("Failed with this error: "+err);}
+}
 
 /*export async function deploy(name, abi, bytecode) {
     const account = await getSender(web3);

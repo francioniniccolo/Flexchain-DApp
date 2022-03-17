@@ -29,7 +29,7 @@ export default function BpmnModeler() {
     const [modeler, setModeler] = useState();
     const [diagramName,setDiagramName]=useState('diagram.bpmn');
     const [diagramContent,setDiagramContent]=useState('');
-    const [quorum,setQuorum]=useState(1);
+    const [quorum,setQuorum]=useState(2);
     const [show, setShow] = useState(false);
 
     const handleClose = () => setShow(false);
@@ -116,7 +116,7 @@ export default function BpmnModeler() {
                     <Form.Label style={{fontFamily:'Arial',marginBottom: '0', marginLeft: '30px'}}>Quorum</Form.Label>
                     <Form.Control type="number"  style={{width: '10%',display: 'inline-block', marginLeft: '30px'}}
                                   value={quorum}
-                                  min={1}
+                                  min={2}
                                   onChange={e => setQuorum(e.target.value)}
                     />
 

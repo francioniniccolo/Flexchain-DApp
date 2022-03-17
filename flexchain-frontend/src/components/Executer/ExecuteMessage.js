@@ -9,6 +9,7 @@ import {RiUploadCloudFill as IconUpload} from "react-icons/ri";
 import './style.css'
 import {TEMPLATE_ABI} from "../../contracts/ProcessTemplate";
 import Offcanvas from "react-bootstrap/Offcanvas";
+import Modal from "react-bootstrap/Modal"
 import {GoChevronLeft as RightIcon} from "react-icons/go";
 import EventAccordion from "../EventAccordion/EventAccordion";
 
@@ -19,6 +20,12 @@ const ExecuteMessage = () => {
         setShow(true);
     }
 
+    const handleCloseModal = () => setShowModal(false);
+    const handleShowModal = () => setShowModal(true);
+
+    const[varValue,setVarValue]=useState();
+    const[varName,setVarName]=useState("");
+    const [showModal, setShowModal] = useState(false);
     const [show, setShow] = useState(false);
     const [parameters, setParameters] = useState();
     const [message, setMessage] = useState();
@@ -111,9 +118,40 @@ const ExecuteMessage = () => {
 
     }
 
+   async function getValue(){
+        const response= await fetch('/getValue/'+varName+"/"+address);
+        setVarValue( await response.text());
+    }
 
     return (
         <Container className='mt-5'>
+
+            <Modal show={showModal} onHide={handleCloseModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Get variable value from contract</Modal.Title>
+                </Modal.Header>
+                <Modal.Body><Form.Label style={{marginBottom: '0'}}>Variable name</Form.Label>
+                    <Form.Control type="text" placeholder="Insert name..." style={{width: '40%'}}
+                                  onChange={e => setVarName([e.target.value])}
+                    />
+                    <br/>
+                    <Form.Control
+                        style={{width: '40%'}}
+                        type="text"
+                        value={varValue}
+                        disabled
+                        readOnly
+                    />
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseModal}>
+                        Close
+                    </Button>
+                    <Button variant="primary" onClick={(e)=>getValue()}>
+                        Get Value
+                    </Button>
+                </Modal.Footer>
+            </Modal>
 
             <h5 title='Show events panel' style={{fontFamily:'Arial', width:'200px',float:'right'}} className='mt-4' onClick={handleShow} onMouseLeave={(e)=>e.target.style.color='black'} onMouseOver={(e)=>e.target.style.color='grey'}><i>Events Panel</i><RightIcon/></h5>
 
@@ -122,7 +160,7 @@ const ExecuteMessage = () => {
                     <Offcanvas.Title>Events Panel</Offcanvas.Title>
                 </Offcanvas.Header>
                 <Offcanvas.Body>
-                 <EventAccordion events={events}/>
+                 <EventAccordion events={events} address={address}/>
                 </Offcanvas.Body>
             </Offcanvas>
 
@@ -143,6 +181,9 @@ const ExecuteMessage = () => {
                 </Form.Group>
                 <Button variant="primary" onClick={() => executeMessage(contract, message, parameters)}>
                     Execute message
+                </Button>
+                <Button variant="info" style={{marginLeft:'5px'}} onClick={handleShowModal}>
+                    Get Variable Value
                 </Button>
             </Form>
             <div className='mt-3' id="canvas-viewer" style={{height: 600, width: '100%', border: '1px solid grey'}}>

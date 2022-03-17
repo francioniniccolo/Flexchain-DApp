@@ -45,7 +45,7 @@ public class BlockchainUtils {
 
     //todo
     public void setContract(String address) {
-        contract = Process.load(address, web3j, Credentials.create("73eab42a11e7f7676a86c39547aea4dced4452e108fd0e7313bd0c8af62fbd5e"), new DefaultGasProvider());
+        contract = Process.load(address, web3j, Credentials.create("111a1712072f1393ce00200d6da6b0c79ab02672987b105b2ac11df411fea86e"), new DefaultGasProvider());
     }
 
     public String getProcess(String processName) throws Exception {
@@ -58,7 +58,7 @@ public class BlockchainUtils {
 
     //todo
     public void subToMessages(String address) throws Exception {
-        Process contract = Process.load(address, web3j, Credentials.create("73eab42a11e7f7676a86c39547aea4dced4452e108fd0e7313bd0c8af62fbd5e"), new DefaultGasProvider());
+        Process contract = Process.load(address, web3j, Credentials.create("111a1712072f1393ce00200d6da6b0c79ab02672987b105b2ac11df411fea86e"), new DefaultGasProvider());
         BigInteger latestBlock = getLatestBlockNumber();
         System.out.println("Listening from block number: " + latestBlock);
 
@@ -151,7 +151,7 @@ public class BlockchainUtils {
 
     //todo
     private Monitor getMonitor() {
-        Monitor monitor = Monitor.load("0x5c58fb00F0d6A2069649BbFB43d856d88f82b73b", web3j, Credentials.create("73eab42a11e7f7676a86c39547aea4dced4452e108fd0e7313bd0c8af62fbd5e"), new DefaultGasProvider());
+        Monitor monitor = Monitor.load("0xE87c98e293460784c5E00f7F99862B6548E09a2c", web3j, Credentials.create("111a1712072f1393ce00200d6da6b0c79ab02672987b105b2ac11df411fea86e"), new DefaultGasProvider());
         return monitor;
     }
 
