@@ -213,6 +213,8 @@ public class BlockchainUtils {
         while (valuesIterator.hasNext()){valuesBytes.add(stringToBytes32(valuesIterator.next()));}
 
         try {
+            for(int i=0;i<namesBytes.size();i++){System.out.println("name"+i+": "+bytes32ToString(namesBytes.get(i)));}
+            for(int i=0;i<valuesBytes.size();i++){System.out.println("value"+i+": "+bytes32ToString(valuesBytes.get(i)));}
             contract.setVariables(namesBytes, valuesBytes, messageId).send();
             System.out.println("Variables set");
         } catch (Exception e) {

@@ -16,7 +16,17 @@ import EventAccordion from "../EventAccordion/EventAccordion";
 const ExecuteMessage = () => {
 
     const handleClose = () => setShow(false);
-    const handleShow = () => {
+    const handleShow = async () => {
+        const cont = new web3.eth.Contract(TEMPLATE_ABI, address);
+        setContract(cont);
+        await cont.getPastEvents('allEvents',
+            {
+                fromBlock: 0,
+                toBlock: 'latest'
+            }, function (error, e) {
+                setEvents(e);
+                console.log(e);
+            });
         setShow(true);
     }
 
@@ -55,14 +65,6 @@ const ExecuteMessage = () => {
     const getAddressFromSelect = async (data) => {
         console.log(data)
         setAddress(data)
-        const cont = new web3.eth.Contract(TEMPLATE_ABI,data);
-        setContract(cont);
-        await cont.getPastEvents('allEvents',
-            {fromBlock: 0,
-            toBlock: 'latest'}, function (error, e) {
-            setEvents(e);
-            console.log(e);
-        });
         const ids = await getIds(data);
         setIds(ids);
         const i= await fetch('/messageListener/'+data, {
@@ -179,7 +181,7 @@ const ExecuteMessage = () => {
                         />
                     </Col>
                 </Form.Group>
-                <Button variant="primary" onClick={() => executeMessage(contract, message, parameters)}>
+                <Button variant="primary" onClick={() => executeMessage(address, message, parameters)}>
                     Execute message
                 </Button>
                 <Button variant="info" style={{marginLeft:'5px'}} onClick={handleShowModal}>
@@ -221,10 +223,11 @@ function UploadBtnClicked(upload) {
 }
 
 
-async function executeMessage(contract, message, parameters) {
+async function executeMessage(address, message, parameters) {
     const web3 = getWeb3();
     const account = await getSender(web3);
     console.log(message)
     console.log(parameters)
-    await contract.methods.executeMessage(message, parameters).send({from: account});
+    const cont = new web3.eth.Contract(TEMPLATE_ABI, address);
+    await cont.methods.executeMessage(message, parameters).send({from: account});
 }

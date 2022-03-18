@@ -4,7 +4,7 @@ import Viewer from 'chor-js/lib/NavigatedViewer';
 import React, {useState, useEffect} from "react";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
-import {RiUploadCloudFill as IconUpload} from "react-icons/ri";
+import {RiDownloadCloudFill as IconDownload, RiUploadCloudFill as IconUpload} from "react-icons/ri";
 import Form from "react-bootstrap/Form";
 import './style.css'
 import {GoChevronRight as RightIcon} from 'react-icons/go'
@@ -112,8 +112,11 @@ export default function Updater() {
         let canvas = viewer.get('canvas');
         let registry = viewer.get('elementRegistry')
         const elements = registry.getAll();
-        let check =diagramCheck(ids,elements)
-        if (check == true) {alert("Diagramma e contratto non corrispondono")}
+        /*
+        *Togliere il commento se si vuole fare il check del diagramma
+        * let check =diagramCheck(ids,elements)
+        *if (check == true) {alert("Diagramma e contratto non corrispondono")}
+         */
     }
 
     async function updateRules(address) {
@@ -151,6 +154,8 @@ export default function Updater() {
                 UploadBtnClicked(document.getElementById('upload'))
             }} style={{display: 'inline-block', marginLeft: '30px', marginBottom: '20px'}}><IconUpload
                 size='40'/></Button>
+            <Button title="Download BPMN XML file" onClick={() =>downloadFile(modeler)}
+                    style={{display: 'inline-block', marginLeft: '30px',marginBottom: '20px'}}><IconDownload size='40'/></Button>
             <Button style={{display: 'inline-block', marginLeft: '30px', marginBottom: '20px'}} onClick={() => {
                 showChanges(modeler, elementsCount, viewer, elementRegistry)
             }}>Show Changes</Button>
@@ -236,5 +241,15 @@ function showChanges(modeler, elementsCount, viewer, registry) {
     }
 }
 
+async function downloadFile(modeler) {
+    try {
+        const result = await modeler.saveXML({format: true});
+        const url = 'data:application/bpmn20-xml;charset=UTF-8,' + encodeURIComponent(result.xml);
+        const link = document.createElement('a');
+        link.download = 'diagram.bpmn';
+        link.href = url;
+        link.click();
+    }catch (e){alert("Caricare un diagramma prima del download")}
+}
 
 

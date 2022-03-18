@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xs="http://www.w3.org/2001/XMLSchema" id="_tTv5YOycEeiHGOQ2NkJZNQ" targetNamespace="http://www.signavio.com">
-  <bpmn2:message id="Message_1j4s0qh" name="production(string message, bool error)" />
-  <bpmn2:message id="Message_0gg08bf" name="payment1(address payable to)" />
-  <bpmn2:message id="Message_0i0xp6a" name="cost(uint amount)" />
-  <bpmn2:message id="Message_1uiozoi" name="selection(string product)" />
-  <bpmn2:message id="Message_1e90tfn" name="products(string products)" />
+  <bpmn2:message id="Message_1j4s0qh" name="production(message,error)" />
+  <bpmn2:message id="Message_0gg08bf" name="payment1(payableTo)" />
+  <bpmn2:message id="Message_0i0xp6a" name="cost(amount)" />
+  <bpmn2:message id="Message_1uiozoi" name="selection(product)" />
+  <bpmn2:message id="Message_1e90tfn" name="products(products)" />
   <bpmn2:choreography id="Choreography">
     <bpmn2:participant id="Participant_1pasf6v" name="Customer" />
     <bpmn2:participant id="Participant_1tddbk5" name="Coffee_machine" />
@@ -61,11 +61,11 @@
     </bpmn2:exclusiveGateway>
     <bpmn2:sequenceFlow id="SequenceFlow_1s5opbd" sourceRef="StartEvent_1v2ab61" targetRef="ExclusiveGateway_1sp1v7s" />
     <bpmn2:sequenceFlow id="SequenceFlow_1qeuw8y" sourceRef="ExclusiveGateway_1sp1v7s" targetRef="ChoreographyTask_164ymrj" />
-    <bpmn2:sequenceFlow id="SequenceFlow_1x5k1vx" name="error==true" sourceRef="ExclusiveGateway_0c8hy9b" targetRef="ExclusiveGateway_1sp1v7s" />
+    <bpmn2:sequenceFlow id="SequenceFlow_1x5k1vx" name="error == true" sourceRef="ExclusiveGateway_0c8hy9b" targetRef="ExclusiveGateway_1sp1v7s" />
     <bpmn2:endEvent id="EndEvent_17h95ah">
       <bpmn2:incoming>SequenceFlow_0j4i53n</bpmn2:incoming>
     </bpmn2:endEvent>
-    <bpmn2:sequenceFlow id="SequenceFlow_0j4i53n" name="error==false" sourceRef="ExclusiveGateway_0c8hy9b" targetRef="EndEvent_17h95ah" />
+    <bpmn2:sequenceFlow id="SequenceFlow_0j4i53n" name="error == false" sourceRef="ExclusiveGateway_0c8hy9b" targetRef="EndEvent_17h95ah" />
   </bpmn2:choreography>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_Choreography_1" bpmnElement="Choreography">
@@ -144,7 +144,7 @@
         <di:waypoint x="256" y="399" />
         <di:waypoint x="256" y="267" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="592" y="381" width="56" height="14" />
+          <dc:Bounds x="590" y="381" width="62" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="EndEvent_17h95ah_di" bpmnElement="EndEvent_17h95ah">
@@ -154,7 +154,7 @@
         <di:waypoint x="1008" y="242" />
         <di:waypoint x="1100" y="242" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1024" y="224" width="60" height="14" />
+          <dc:Bounds x="1022" y="224" width="66" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>

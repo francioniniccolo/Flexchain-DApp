@@ -99,8 +99,10 @@ export default function BpmnModeler() {
                     createNewDiagram(modeler)
                 }} style={{}}><IconNew size='40' style={{display: 'inline-block'}}/></Button>
 
-                <Button title="Download BPMN XML file" onClick={() =>downloadFile(modeler)}
-                        style={{display: 'inline-block', marginLeft: '30px'}}><IconDownload size='40'/></Button>
+
+
+
+
 
                 <Button title="Upload BPMN XML file" onClick={() => {
                     UploadBtnClicked(document.getElementById('upload'))
