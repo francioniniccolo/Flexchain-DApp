@@ -17,17 +17,19 @@ const ExecuteMessage = () => {
 
     const handleClose = () => setShow(false);
     const handleShow = async () => {
-        const cont = new web3.eth.Contract(TEMPLATE_ABI, address);
-        setContract(cont);
-        await cont.getPastEvents('allEvents',
-            {
-                fromBlock: 0,
-                toBlock: 'latest'
-            }, function (error, e) {
-                setEvents(e);
-                console.log(e);
-            });
-        setShow(true);
+       if(address!=null) {
+           const cont = new web3.eth.Contract(TEMPLATE_ABI, address);
+           setContract(cont);
+           await cont.getPastEvents('allEvents',
+               {
+                   fromBlock: 0,
+                   toBlock: 'latest'
+               }, function (error, e) {
+                   setEvents(e);
+                   console.log(e);
+               });
+           setShow(true);
+       }else {alert("Selezionare un contratto!")}
     }
 
     const handleCloseModal = () => setShowModal(false);
@@ -45,7 +47,7 @@ const ExecuteMessage = () => {
     const [contract, setContract] = useState();
     const [events,setEvents]=useState();
     const [abi, setAbi] = useState();
-    const [address, setAddress] = useState();
+    const [address, setAddress] = useState(null);
     const [viewer, setViewer] = useState();
     const web3 = getWeb3();
 

@@ -5,7 +5,7 @@ import NavigationBar from "./components/NavigationBar/NavigationBar";
 import BpmnModeler from "./components/Modeler/BpmnModeler";
 import Updater from "./components/Updater/Updater"
 import ExecuteMessage from "./components/Executer/ExecuteMessage";
-import Ipfs from "./Ipfs";
+
 
 
 const App = ()=>(

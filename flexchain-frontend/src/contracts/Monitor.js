@@ -1,5 +1,5 @@
 //todo
-export const MONITOR_ADDRESS="0xE87c98e293460784c5E00f7F99862B6548E09a2c";
+export const MONITOR_ADDRESS="0x25E9A9981682Fc4C6fE4BaECD7b3746aBc7EeD2e";
 export const ABI=[
 	{
 		"inputs": [],
