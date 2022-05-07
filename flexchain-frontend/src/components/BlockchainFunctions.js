@@ -11,72 +11,83 @@ export async function getProcessTemplateABI(){
     return abi.abi;
 }
 
-export async function deployProcessTemplate(contractName,diagramContent,quorum) {
-    const account = await getSender(web3);
-    const contract = new web3.eth.Contract(ABI,MONITOR_ADDRESS);
-    const names= await contract.methods.getDiagramNames().call();
+export async function deployProcessTemplate(contractName, diagramContent, quorum) {
+    //Ottiene l'indirizzo dell'account dell'utente che fa il deployment
+    const account = await getSender(web3)
+
+    //Ottiene l'instanza del Monitor
+    const contract = new web3.eth.Contract(ABI, MONITOR_ADDRESS);
+
+    //Controlla se il nome del processo è già presente nella lista del Monitor
+    const names = await contract.methods.getDiagramNames().call();
     console.log(names);
     let isNew = true;
-    if(names.includes(contractName)){isNew=false;}
-    await contract.methods.instantiateProcess(contractName,quorum,isNew).send({from:account});
+    if (names.includes(contractName)) {
+        isNew = false;
+    }
+
+    //Chiamata alla funzione del Monitor per l'instanziazione di un nuovo processo
+    await contract.methods.instantiateProcess(contractName, quorum, isNew).send({from: account});
+
     let gen_rul;
     let gen_id;
 
-    const r= await fetch('/translate_post/'+contractName, {
-                  method: 'POST',
-                  body: diagramContent
-                })
-                .then(response => response.json())
-                .then(data => {
-                  console.log('Success:', data);
-                  gen_rul=data
-                })
-                .catch((error) => {
-                  console.error('Error:', error);
-                });
+    //Chiamate alla REST API del server per la traduzione del diagramma
+    const r = await fetch('/translate_post/' + contractName, {
+        method: 'POST',
+        body: diagramContent
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+            gen_rul = data
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
 
-     const i= await fetch('/translate_post_id/'+contractName, {
-                       method: 'POST',
-                       body: diagramContent
-                     })
-                     .then(response => response.json())
-                     .then(data => {
-                       console.log('Success:', data);
-                       gen_id=data;
-                     })
-                     .catch((error) => {
-                       console.error('Error:', error);
-                     });
+    const i = await fetch('/translate_post_id/' + contractName, {
+        method: 'POST',
+        body: diagramContent
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+            gen_id = data;
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
 
     // console.log(gen_rul);
 
-    const serverRules= await fetch("/generate-rules");
-    const serverRulesIds= await fetch("/generate-rules-id");
+    const serverRules = await fetch("/generate-rules");
+    const serverRulesIds = await fetch("/generate-rules-id");
     const rul = (await serverRules.text()).split('$')
-   const id = (await serverRulesIds.text()).split(',')
-     //const hash_rules= await saveRulesToIPFS(JSON.stringify(rul));
-     const hash_rules= await saveRulesToIPFS(JSON.stringify(gen_rul));
-     //const hash_ids=  await saveIdsToIPFS(JSON.stringify(id));
-     const hash_ids=  await saveIdsToIPFS(JSON.stringify(gen_id));
+    const id = (await serverRulesIds.text()).split(',')
+    //const hash_rules= await saveRulesToIPFS(JSON.stringify(rul));
+    const hash_rules = await saveRulesToIPFS(JSON.stringify(gen_rul));
+    //const hash_ids=  await saveIdsToIPFS(JSON.stringify(id));
+    const hash_ids = await saveIdsToIPFS(JSON.stringify(gen_id));
 
-     console.log(hash_rules)
-     console.log(hash_ids)
+    console.log(hash_rules)
+    console.log(hash_ids)
 
     const address = await getProcessAddress(contractName);
-    await setRulesHash(hash_rules,hash_ids,address);
+    await setRulesHash(hash_rules, hash_ids, address);
 
-     console.log(await getIds(address));
+    console.log(await getIds(address));
     console.log(await getRules(address));
 
-   /* const client = create('https://ipfs.infura.io:5001/api/v0');
-    const file = new File(rul,"rules.json");
-    try {
-        const added = await client.add(file)
-        const url = `https://ipfs.infura.io/ipfs/${added.path}`
-        console.log(url);
-    } catch (error) {
-        console.log('Error uploading file: ', error)
-    }*/
+    /* const client = create('https://ipfs.infura.io:5001/api/v0');
+     const file = new File(rul,"rules.json");
+     try {
+         const added = await client.add(file)
+         const url = `https://ipfs.infura.io/ipfs/${added.path}`
+         console.log(url);
+     } catch (error) {
+         console.log('Error uploading file: ', error)
+     }*/
 }
 
 export async function generateRules(contractName,diagramContent){

@@ -1,8 +1,6 @@
 package it.unicam.cs.Flexchain;
 
 import it.unicam.cs.Flexchain.translator.Translator;
-import org.kie.api.runtime.KieContainer;
-import org.kie.api.runtime.KieSession;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedWriter;
@@ -10,7 +8,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -22,7 +19,8 @@ public class Controller {
     public void getProcess(@PathVariable String address){
         try {
             utils.setContract(address);
-            utils.createDroolsFile();
+            //utils.createDroolsFile();
+            utils.createTempFile();
             utils.subToMessages(address);
         }catch (Exception e){System.out.println(e.getMessage());}
 

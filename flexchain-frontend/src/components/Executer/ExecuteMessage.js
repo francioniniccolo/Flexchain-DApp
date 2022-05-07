@@ -32,7 +32,7 @@ const ExecuteMessage = () => {
        }else {alert("Selezionare un contratto!")}
     }
 
-    const handleCloseModal = () => setShowModal(false);
+    const handleCloseModal = () =>{ setShowModal(false); setVarValue(null);}
     const handleShowModal = () => setShowModal(true);
 
     const[varValue,setVarValue]=useState();
@@ -47,8 +47,9 @@ const ExecuteMessage = () => {
     const [contract, setContract] = useState();
     const [events,setEvents]=useState();
     const [abi, setAbi] = useState();
-    const [address, setAddress] = useState(null);
+    const [address, setAddress] = useState("");
     const [viewer, setViewer] = useState();
+    const [itemStatus, setItem] = useState([]);
     const web3 = getWeb3();
 
     useEffect(async () => {
@@ -68,7 +69,8 @@ const ExecuteMessage = () => {
         console.log(data)
         setAddress(data)
         const ids = await getIds(data);
-        setIds(ids);
+        checkMessageStatus(ids,data);
+       // setIds(ids);
         const i= await fetch('/messageListener/'+data, {
             method: 'POST'
         })
@@ -86,7 +88,9 @@ const ExecuteMessage = () => {
         setMessage(message);
         let canvas = viewer.get('canvas');
         let registry = viewer.get('elementRegistry')
+        console.log(canvas._elementRegistry)
         const elements = registry.getAll();
+
         let check = diagramCheck(ids, elements)
 
         if (check == true) {
@@ -98,18 +102,47 @@ const ExecuteMessage = () => {
                 //console.log(element.businessObject.id)
                 if (element.businessObject.id == message) {
                     if (previousMessage != null) {
-                        console.log(previousMessage.businessObject.id)
+                        //console.log(previousMessage.businessObject.id)
                         canvas.removeMarker(previousMessage, 'highlight')
-                        console.log("remove")
+                      //  console.log("remove")
                     }
                     canvas.addMarker(element, 'highlight');
-                    console.log(element)
+                   // console.log(element)
                     setPreviousMessage(element)
                 }
 
             })
         }
     }
+
+    function checkMessageStatus(ids,address) {
+        const contract = new web3.eth.Contract(TEMPLATE_ABI, address);
+
+        async function f(id) {
+            return await contract.methods.getMessage(id).call();
+        }
+       // console.log(ids);
+        ids.map(
+            (id) => {
+                f(id).then(status => {
+                    //console.log(status);
+                    if (status == 0) {
+                        let values = itemStatus;
+                        values.push(false)
+                        setItem(values);
+                    } else {
+                        let values = itemStatus;
+                        values.push(true)
+                        setItem(values);
+                    }
+                })
+            }
+        );
+      // console.log(itemStatus);
+        setIds(ids);
+    };
+
+
 
     function loadDiagram(file) {
         if (file) {
@@ -130,6 +163,7 @@ const ExecuteMessage = () => {
     return (
         <Container className='mt-5'>
 
+            {/* Modal per leggere le variabili dal contratto */}
             <Modal show={showModal} onHide={handleCloseModal}>
                 <Modal.Header closeButton>
                     <Modal.Title>Get variable value from contract</Modal.Title>
@@ -157,8 +191,8 @@ const ExecuteMessage = () => {
                 </Modal.Footer>
             </Modal>
 
+            {/* Pannello degli eventi */}
             <h5 title='Show events panel' style={{fontFamily:'Arial', width:'200px',float:'right'}} className='mt-4' onClick={handleShow} onMouseLeave={(e)=>e.target.style.color='black'} onMouseOver={(e)=>e.target.style.color='grey'}><i>Events Panel</i><RightIcon/></h5>
-
             <Offcanvas placement={'end'} show={show} onHide={handleClose} >
                 <Offcanvas.Header closeButton>
                     <Offcanvas.Title>Events Panel</Offcanvas.Title>
@@ -168,19 +202,22 @@ const ExecuteMessage = () => {
                 </Offcanvas.Body>
             </Offcanvas>
 
+            {/*Select dei contratti*/}
             <SelectAddress  diagramsList={diagramsList} childToParent={getAddressFromSelect}/>
+
             <Form className='mt-4'>
                 <Form.Group as={Row} className="mb-3" controlId="formBasicEmail">
 
                     <Col xs={2}>
-                        <SelectMessage idsList={ids} getMessage={getMessage}/>
+                        {/*Select dei messaggi*/}
+                        <SelectMessage idsStatus={itemStatus} address={address} idsList={ids} getMessage={getMessage}/>
                     </Col>
                     <Col>
                         <Form.Label style={{marginBottom: '0'}}>Message Parameters</Form.Label>
                         <Form.Control type="text" placeholder="Insert parameters..." style={{width: '30%'}}
                                       value={parameters}
                                       onChange={e => setParameters([e.target.value])}
-                        />
+                       />
                     </Col>
                 </Form.Group>
                 <Button variant="primary" onClick={() => executeMessage(address, message, parameters)}>

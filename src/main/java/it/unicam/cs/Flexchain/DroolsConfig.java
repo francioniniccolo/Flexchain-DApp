@@ -8,26 +8,26 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.kie.internal.io.ResourceFactory;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 public class DroolsConfig {
 
-    private static final String RULES_PATH = "/src/main/resources";
+    private static final String RULES_PATH = "/src/main/resources/";
     private KieServices kieServices=KieServices.Factory.get();
 
-    public   KieFileSystem getKieFileSystem() throws IOException{
+    public   KieFileSystem getKieFileSystem(File rulesFile) throws IOException{
         KieFileSystem kieFileSystem = kieServices.newKieFileSystem();
-        kieFileSystem.write(ResourceFactory.newClassPathResource("rules.drl"));
+        //kieFileSystem.write(ResourceFactory.newClassPathResource(rulesFile));
+        kieFileSystem.write(ResourceFactory.newFileResource(rulesFile));
         return kieFileSystem;
 
     }
 
-    public KieContainer getKieContainer() throws IOException {
+    public KieContainer getKieContainer(File rulesFile) throws IOException {
         getKieRepository();
 
-        KieBuilder kb = kieServices.newKieBuilder(getKieFileSystem());
+        KieBuilder kb = kieServices.newKieBuilder(getKieFileSystem(rulesFile));
         kb.buildAll();
 
         KieModule kieModule = kb.getKieModule();

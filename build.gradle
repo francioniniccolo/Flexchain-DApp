@@ -30,6 +30,8 @@ dependencies {
 	implementation 'org.json:json:20211205'
 	implementation group: 'org.kie', name: 'kie-ci', version: '8.16.1.Beta'
 	implementation group: 'org.drools', name: 'drools-decisiontables', version: '8.16.1.Beta'
+	//implementation group: 'org.drools', name: 'drools-xml-support', version: '8.20.0.Beta'
+	//implementation group: 'org.drools', name: 'drools-core', version: '8.20.0.Beta'
 	implementation 'org.camunda.bpm.model:camunda-bpmn-model:7.17.0-alpha4'
 	implementation 'org.camunda.bpm.model:camunda-xml-model:7.17.0-alpha4'
 

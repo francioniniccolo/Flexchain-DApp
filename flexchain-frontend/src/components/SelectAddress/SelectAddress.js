@@ -31,7 +31,7 @@ export default function SelectAddress(props) {
                        {props.diagramsList.map(
 
                            (diagram)=>(
-                                <MenuItem value={diagram}>
+                                <MenuItem key={diagram} value={diagram}>
                                  <em>{diagram}</em>
                                 </MenuItem>
 

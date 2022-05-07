@@ -159,7 +159,9 @@ public class Translator {
             } else {
                 listInputs += "b.getSingleInput(" + split2.indexOf(param) + "),";
             }
+            listNames1+= " List names = new ArrayList();\n";
              listNames1+= "    names.add("+"\"" + paramName + "\");\n";
+            listInputs1 += " List values = new ArrayList();\n";
              listInputs1 += "    values.add("+ "b.getSingleInput(" + split2.indexOf(param) + "));\n";
         }
       //  listTypes += "});\n";

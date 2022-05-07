@@ -1,0 +1,48 @@
+import it.unicam.cs.Flexchain.BlockchainUtils;
+import java.util.List;
+import java.util.ArrayList;
+
+dialect  "mvel"
+rule "Message_193q5i6"
+when
+  b : BlockchainUtils(b.getState("Message_193q5i6")==0)
+then
+ List names = new ArrayList();
+    names.add("stringfilmName");
+ List values = new ArrayList();
+    values.add(b.getSingleInput(0));
+    b.setVariablesToContract(names, values, "Message_193q5i6");
+ end
+
+rule "Message_0xpdds0"
+when
+  b : BlockchainUtils(b.getState("Message_0xpdds0")==0, b.getState("Message_193q5i6")==2)
+then
+ List names = new ArrayList();
+    names.add("doubleprice");
+ List values = new ArrayList();
+    values.add(b.getSingleInput(0));
+    b.setVariablesToContract(names, values, "Message_0xpdds0");
+ end
+
+rule "Message_1581ada"
+when
+  b : BlockchainUtils(b.getState("Message_1581ada")==0, b.getState("Message_0xpdds0")==2)
+then
+ List names = new ArrayList();
+    names.add("doubleprice");
+ List values = new ArrayList();
+    values.add(b.getSingleInput(0));
+    b.setVariablesToContract(names, values, "Message_1581ada");
+ end
+
+rule "Message_1gu3oev"
+when
+  b : BlockchainUtils(b.getState("Message_1gu3oev")==0, b.getState("Message_1581ada")==2)
+then
+ List names = new ArrayList();
+    names.add("filefilm");
+ List values = new ArrayList();
+    values.add(b.getSingleInput(0));
+    b.setVariablesToContract(names, values, "Message_1gu3oev");
+ end

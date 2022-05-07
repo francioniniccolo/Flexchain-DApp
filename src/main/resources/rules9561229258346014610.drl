@@ -1,0 +1,37 @@
+import it.unicam.cs.Flexchain.BlockchainUtils;
+import java.util.List;
+import java.util.ArrayList;
+
+dialect  "mvel"
+rule "Message_2pam53q"
+when
+  b : BlockchainUtils(b.getState("Message_2pam53q")==0)
+then
+ List names = new ArrayList();
+    names.add("pizza");
+ List values = new ArrayList();
+    values.add(b.getSingleInput(0));
+    b.setVariablesToContract(names, values, "Message_2pam53q");
+ end
+
+rule "Message_2mi4idx"
+when
+  b : BlockchainUtils(b.getState("Message_2mi4idx")==0, b.getState("Message_2pam53q")==2)
+then
+ List names = new ArrayList();
+    names.add("check");
+ List values = new ArrayList();
+    values.add(b.getSingleInput(0));
+    b.setVariablesToContract(names, values, "Message_2mi4idx");
+ end
+
+rule "Message_2rnq4x3"
+when
+  b : BlockchainUtils(b.getState("Message_2rnq4x3")==0, b.getState("Message_2mi4idx")==2)
+then
+ List names = new ArrayList();
+    names.add("bill");
+ List values = new ArrayList();
+    values.add(b.getSingleInput(0));
+    b.setVariablesToContract(names, values, "Message_2rnq4x3");
+ end

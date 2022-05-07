@@ -7,8 +7,16 @@ import it.unicam.cs.Flexchain.wrappers.Monitor;
 import it.unicam.cs.Flexchain.wrappers.Process;
 import org.apache.commons.codec.binary.Hex;
 import org.json.JSONArray;
+import org.kie.api.KieServices;
+import org.kie.api.builder.KieBuilder;
+import org.kie.api.builder.KieFileSystem;
+import org.kie.api.builder.KieRepository;
+import org.kie.api.builder.Message;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.StatelessKieSession;
+import org.kie.api.runtime.rule.FactHandle;
+import org.kie.internal.io.ResourceFactory;
 import org.web3j.abi.datatypes.Utf8String;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
@@ -18,9 +26,7 @@ import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.abi.datatypes.generated.Bytes32;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -31,12 +37,14 @@ import org.web3j.utils.Numeric;
 
 public class BlockchainUtils {
 
-    DroolsConfig conf = new DroolsConfig();
+   // DroolsConfig conf = new DroolsConfig();
     Monitor monitor;
     Web3j web3j;
     BigInteger lastEventBlockNumber = BigInteger.valueOf(0L);
     Process contract;
     List<String> messageInputs;
+    File rulesFile;
+
 
     public BlockchainUtils() {
         web3j = getWeb3j();
@@ -45,7 +53,7 @@ public class BlockchainUtils {
 
     //todo
     public void setContract(String address) {
-        contract = Process.load(address, web3j, Credentials.create("80a28a9b8694d1dd909680ac4b342ee5276b96b241a9784f41e52c8686528205"), new DefaultGasProvider());
+        contract = Process.load(address, web3j, Credentials.create(BlockchainConfig.getInstance().PRIVATE_KEY), new DefaultGasProvider());
     }
 
     public String getProcess(String processName) throws Exception {
@@ -58,7 +66,7 @@ public class BlockchainUtils {
 
     //todo
     public void subToMessages(String address) throws Exception {
-        Process contract = Process.load(address, web3j, Credentials.create("80a28a9b8694d1dd909680ac4b342ee5276b96b241a9784f41e52c8686528205"), new DefaultGasProvider());
+        Process contract = Process.load(address, web3j, Credentials.create(BlockchainConfig.getInstance().PRIVATE_KEY), new DefaultGasProvider());
         BigInteger latestBlock = getLatestBlockNumber();
         System.out.println("Listening from block number: " + latestBlock);
 
@@ -96,10 +104,34 @@ public class BlockchainUtils {
                             Thread.currentThread().interrupt();
                         }
                         System.out.println("Interruption finished!");*/
-                        fireRules();
-
+                        fireRules2();
+                        //fire();
                     }
                 });
+    }
+    public void createTempFile() throws Exception {
+        if(rulesFile!=null){rulesFile.delete();}
+        String hash_rules = contract.getRulesIpfs().send();
+        String hash_ids = contract.getIdsIpfs().send();
+        ArrayList<String> rules = getRulesFromIpfs(hash_rules, hash_ids);
+        String header = "import it.unicam.cs.Flexchain.BlockchainUtils;\n" +
+                "import java.util.List;\n" +
+                "import java.util.ArrayList;\n" +
+                "\n" +
+                "dialect  \"mvel\"";
+        File tmpFile = File.createTempFile("rules", ".drl", new File("src/main/resources/"));
+        FileWriter writer = new FileWriter(tmpFile);
+        writer.write(header);
+        for (int i = 0; i < rules.size(); i++) {
+            writer.write(System.getProperty( "line.separator" ));
+            writer.write(rules.get(i));
+        }
+        writer.flush();
+        writer.close();
+        System.out.println(tmpFile.getName());
+        rulesFile = tmpFile.getAbsoluteFile();
+        System.out.println(tmpFile.getAbsoluteFile());
+        tmpFile.deleteOnExit();
     }
 
     public void createDroolsFile() throws Exception {
@@ -107,28 +139,43 @@ public class BlockchainUtils {
         String hash_ids = contract.getIdsIpfs().send();
         ArrayList<String> rules = getRulesFromIpfs(hash_rules, hash_ids);
         String header = "import it.unicam.cs.Flexchain.BlockchainUtils;\n" +
+                "import java.util.List;\n" +
+                "import java.util.ArrayList;\n" +
+                "\n" +
+                "dialect  \"mvel\"";
+        /*String header = "import it.unicam.cs.Flexchain.BlockchainUtils;\n" +
                 "global java.util.List names;\n" +
                 "global java.util.List values;\n" +
                 "\n" +
-                "dialect  \"mvel\"";
-        FileWriter fw = new FileWriter("src/main/resources/rules.drl", false);
-        BufferedWriter bw = new BufferedWriter(fw);
-        bw.write(header);
-        for (int i=0;i<rules.size();i++){
+                "dialect  \"mvel\"";*/
+        try {
+            FileWriter fw = new FileWriter("src/main/resources/rules.drl", false);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(header);
+            for (int i = 0; i < rules.size(); i++) {
+                bw.newLine();
+                bw.write(rules.get(i));
+            }
             bw.newLine();
-            bw.write(rules.get(i));
-        }
-        bw.newLine();
-        bw.close();
+            bw.close();
+            fw.flush();
+            fw.close();
+        }catch (Exception e){e.getStackTrace();}
     }
 
     private void insertToDroolsFile(String rule) throws IOException {
         String header = "import it.unicam.cs.Flexchain.BlockchainUtils;\n" +
+                "import java.util.List;\n" +
+                "import java.util.ArrayList;\n" +
+                "\n" +
+                "dialect  \"mvel\"";
+       /* String header = "import it.unicam.cs.Flexchain.BlockchainUtils;\n" +
                 "global java.util.List names;\n" +
                 "global java.util.List values;\n" +
                 "\n" +
-                "dialect  \"mvel\"";
+                "dialect  \"mvel\"";*/
         FileWriter fw = new FileWriter("src/main/resources/rules.drl", false);
+       // FileWriter fw = new FileWriter("src/main/resources/rules/Rules.drl", false);
         BufferedWriter bw = new BufferedWriter(fw);
         bw.write(header);
         bw.newLine();
@@ -139,19 +186,54 @@ public class BlockchainUtils {
 
     private void fireRules(){
         try{
-            KieContainer kieContainer = conf.getKieContainer();
+            DroolsConfig conf = new DroolsConfig();
+            KieContainer kieContainer = conf.getKieContainer(rulesFile);
             KieSession kieSession = kieContainer.newKieSession();
-            kieSession.insert(this);
-            List names = new ArrayList();
+            //kieSession.insert(this);
+            FactHandle handle = kieSession.insert(this);
+           /* List names = new ArrayList();
             List values = new ArrayList();
             kieSession.setGlobal( "names", names );
-            kieSession.setGlobal( "values", values );
-            kieSession.fireAllRules();}catch (Exception e){System.out.println(e.getMessage());}
+            kieSession.setGlobal( "values", values );*/
+            kieSession.fireAllRules();
+            kieSession.delete(handle);
+            kieSession.destroy();
+        }catch (Exception e){System.out.println(e.getMessage());}
+    }
+    private void fireRules2(){
+        try{
+            DroolsConfig conf = new DroolsConfig();
+            KieContainer kieContainer = conf.getKieContainer(rulesFile);
+            StatelessKieSession kSession = kieContainer.newStatelessKieSession();
+            kSession.execute(this);
+        }catch (Exception e){System.out.println(e.getMessage());}
+    }
+
+    private void fire(){
+        try{
+            KieServices ks = KieServices.Factory.get();
+            KieRepository kr = ks.getRepository();
+            KieFileSystem kfs = ks.newKieFileSystem();
+            kfs.write(ResourceFactory.newClassPathResource("rules.drl"));
+            KieBuilder kb = ks.newKieBuilder(kfs);
+            kb.buildAll();
+            if (kb.getResults().hasMessages(Message.Level.ERROR)) {
+                throw new RuntimeException("Build Errors:\n" + kb.getResults().toString());
+            }
+            KieContainer kc=ks.newKieContainer(kr.getDefaultReleaseId());
+            KieSession kSession = kc.newKieSession();
+            FactHandle handle = kSession.insert( this);
+            kSession.fireAllRules();
+            kSession.delete(handle);
+            kSession.dispose();
+        }catch (Throwable t) {
+            t.printStackTrace();
+        }
     }
 
     //todo
     private Monitor getMonitor() {
-        Monitor monitor = Monitor.load("0x25E9A9981682Fc4C6fE4BaECD7b3746aBc7EeD2e", web3j, Credentials.create("80a28a9b8694d1dd909680ac4b342ee5276b96b241a9784f41e52c8686528205"), new DefaultGasProvider());
+        Monitor monitor = Monitor.load(BlockchainConfig.getInstance().MONITOR_ADDRESS, web3j, Credentials.create(BlockchainConfig.getInstance().PRIVATE_KEY), new DefaultGasProvider());
         return monitor;
     }
 
