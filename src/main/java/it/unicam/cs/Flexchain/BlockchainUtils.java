@@ -23,6 +23,7 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.http.HttpService;
+import org.web3j.tx.gas.ContractGasProvider;
 import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.abi.datatypes.generated.Bytes32;
 
@@ -32,6 +33,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import org.apache.commons.codec.binary.StringUtils;
+import org.web3j.tx.gas.StaticGasProvider;
 import org.web3j.utils.Numeric;
 
 
@@ -53,11 +55,15 @@ public class BlockchainUtils {
 
     //todo
     public void setContract(String address) {
-        contract = Process.load(address, web3j, Credentials.create(BlockchainConfig.getInstance().PRIVATE_KEY), new DefaultGasProvider());
+        System.out.println("setting contract...");
+        BigInteger GAS_LIMIT = BigInteger.valueOf(9_000_000);
+        BigInteger GAS_PRICE = BigInteger.valueOf(10_000_000_000L);
+        contract = Process.load(address, web3j, Credentials.create(BlockchainConfig.getInstance().PRIVATE_KEY), new StaticGasProvider(GAS_PRICE, GAS_LIMIT));
     }
 
     public String getProcess(String processName) throws Exception {
        // if (monitor.isValid()) {
+        System.out.println("getting process from monitor...");
          String address = monitor.getProcess(processName).send();
        //  System.out.println(address);
          return address;
@@ -66,6 +72,7 @@ public class BlockchainUtils {
 
     //todo
     public void subToMessages(String address) throws Exception {
+        System.out.println("starting process listener");
         Process contract = Process.load(address, web3j, Credentials.create(BlockchainConfig.getInstance().PRIVATE_KEY), new DefaultGasProvider());
         BigInteger latestBlock = getLatestBlockNumber();
         System.out.println("Listening from block number: " + latestBlock);
@@ -111,6 +118,7 @@ public class BlockchainUtils {
     }
     public void createTempFile() throws Exception {
         if(rulesFile!=null){rulesFile.delete();}
+        System.out.println("getting rules and ids from ipfs...");
         String hash_rules = contract.getRulesIpfs().send();
         String hash_ids = contract.getIdsIpfs().send();
         ArrayList<String> rules = getRulesFromIpfs(hash_rules, hash_ids);
@@ -238,7 +246,7 @@ public class BlockchainUtils {
     }
 
     private Web3j getWeb3j() {
-        Web3j web3j = Web3j.build(new HttpService("http://localhost:7545"));
+        Web3j web3j = Web3j.build(new HttpService("https://rinkeby.infura.io/v3/165cba6af9774e1aaa692e914a0cfbbb"));
         return web3j;
     }
 

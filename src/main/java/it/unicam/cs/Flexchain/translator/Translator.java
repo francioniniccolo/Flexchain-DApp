@@ -55,11 +55,11 @@ public class Translator {
                 ChoreographyTask task = new ChoreographyTask((ModelElementInstanceImpl) node, modelInstance);
                 String requestId = getRequestId(task);
                 String responseId = getResponseId(task);
-                //if the request exists check if it is enable and if the previous is completed
+                //if the request exists check if it is enable and if the previous is completed && !(source instanceof ParallelGateway)
 
                 if(!requestId.isEmpty()) {
                     try{
-                        if (!(source instanceof StartEvent) && !(source instanceof ParallelGateway)){
+                        if (!(source instanceof StartEvent) ){
                             orCondition = ", ";
                         }
                         String singleRule = "";
@@ -125,11 +125,13 @@ public class Translator {
         List<String> split2 = Arrays.asList(split1[1].split(","));
        // String listTypes = "    List<String> types = Arrays.asList(new String[]{";
         //String listNames = "    List<String> variables = Arrays.asList(new String[]{";
-        String listNames= "    names.add(";
-        String listNames1="";
+        //String listNames= "";
+        //String listNames1="";
+        String listNames1= " List names = new ArrayList();\n";
         //String listInputs = "   List<String> values = Arrays.asList(new String[]{";
-        String listInputs = "    values.add(";
-        String listInputs1="";
+
+        String listInputs1 = " List values = new ArrayList();\n";
+        //String listInputs = "";
 
         for (String param : split2) {
             //now is ["   y   "]
@@ -148,27 +150,31 @@ public class Translator {
                 listTypes += "\'" + buffer.get(0) + "\',";
             }*/
             //same structure but for creating the second list of param names
-            if (split2.indexOf(param) == (split2.size() - 1)) {
-                listNames += "\"" + paramName + "\"";
-            } else {
+           // if (split2.indexOf(param) == (split2.size() - 1)) {
+                listNames1 += "names.add(\"" + paramName + "\");\n";
+                //listNames += "\"" + paramName + "\"";
+            //}
+            /*else {
+
                 listNames += "\"" + paramName + "\",";
-            }
+            }*/
             //if the element is the last one end otherwise add the comma
-            if (split2.indexOf(param) == (split2.size() - 1)) {
+            listInputs1 += "values.add(b.getSingleInput(" + split2.indexOf(param) + "));\n";
+            /*if (split2.indexOf(param) == (split2.size() - 1)) {
                 listInputs += "b.getSingleInput(" + split2.indexOf(param) + ")";
             } else {
                 listInputs += "b.getSingleInput(" + split2.indexOf(param) + "),";
-            }
-            listNames1+= " List names = new ArrayList();\n";
-             listNames1+= "    names.add("+"\"" + paramName + "\");\n";
-            listInputs1 += " List values = new ArrayList();\n";
-             listInputs1 += "    values.add("+ "b.getSingleInput(" + split2.indexOf(param) + "));\n";
+            }*/
+
         }
+
+        //listNames1 += listNames + ");\n";
+        //listInputs1 += listInputs + ");\n";
       //  listTypes += "});\n";
        // listNames += "});\n";
-        listNames += ");\n";
+        //listNames += ");\n";
        // listInputs += "});\n";
-        listInputs += ");\n";
+        //listInputs += ");\n";
 
         String setVariables = "    b.setVariablesToContract(names, values, \"" + messageId + "\");";
 
@@ -283,9 +289,12 @@ public class Translator {
             for (Object f: inc) {
                 //if the element is the latest remove the OR condition
                 //check if the gw has more inputs so if it is a join put the incoming msgs in AND
+
                 getPreviousId((SequenceFlow) f);
-                if(inc.indexOf(f) != (inc.size() -1))
+                if(inc.indexOf(f) != (inc.size() -1)) {
+                    System.out.println("sono dentro al condition &&");
                     orCondition += " && ";
+                }
             }
         }else if(node instanceof EventBasedGateway){
             List<Object> inc = Arrays.asList(((EventBasedGateway) node).getIncoming().toArray());
